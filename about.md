@@ -7,7 +7,7 @@ title: 关于我
 
 平时喜欢专研技术，探究技术实现的底层原理。
 
-除了对Java有一定的了解，本人懂一些Linux、Git、Python、Mysql、Vue的相关知识。
+对Java、Linux、Git、Python、Mysql、Vue有一定的了解。
 
 工作之余喜欢看源码，比如: Spring源码、Mysql源码。
 

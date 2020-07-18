@@ -5,8 +5,8 @@
     <description>欢迎来到我的个人博客~</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 12 Jul 2020 15:48:30 +0800</pubDate>
-    <lastBuildDate>Sun, 12 Jul 2020 15:48:30 +0800</lastBuildDate>
+    <pubDate>Sat, 18 Jul 2020 15:12:48 +0800</pubDate>
+    <lastBuildDate>Sat, 18 Jul 2020 15:12:48 +0800</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
@@ -17,7 +17,7 @@
 
 &lt;p&gt;　　Git的作者Linus，同样是Linux 的缔造者，为了高度推举开源的大旗和更好的开发和管理Linux，开发出了Git这个优秀的版本版本控制系统&lt;/p&gt;
 
-&lt;p&gt;　　作为一位开发者，熟悉掌握Git是一项必备技能，如果连自己编写的代码都不能做到很好的控制，那我们还能写出什么优秀的代码。现在基于Git的版本控制软件有很多，比如：Sourcetree、TortoiseGit等工具，但是本人还是推荐使用命令行操作，因为只有熟练的使用命令行，才能更好的理解底层原理。&lt;/p&gt;
+&lt;p&gt;　　作为一位开发者，熟悉掌握Git是一项非常实用的技能，合理高效的管理代码，不仅可以为我们节约时间，还能提高编码的效率。现在基于Git的版本控制软件有很多，比如：Sourcetree、TortoiseGit等工具，但是本人还是推荐使用命令行操作，因为只有熟练的使用命令行，才能更好的理解底层原理。&lt;/p&gt;
 
 &lt;h3 id=&quot;安装git&quot;&gt;安装Git&lt;/h3&gt;
 &lt;p&gt;参考&lt;a href=&quot;https://git-scm.com/book/zh/v2/%E8%B5%B7%E6%AD%A5-%E5%AE%89%E8%A3%85-Git&quot;&gt;官方安装教程&lt;/a&gt;&lt;/p&gt;
@@ -38,6 +38,10 @@ git config --global user.email &quot;email@example.com&quot;
     &lt;li&gt;git add .（全部添加到暂存区）&lt;/li&gt;
     &lt;li&gt;git commit -m ‘commit message’（提交暂存区的记录到本地仓库）&lt;/li&gt;
     &lt;li&gt;git config (配置和获取Git环境参数)&lt;/li&gt;
+    &lt;li&gt;git status (查看版本库状态)&lt;/li&gt;
+    &lt;li&gt;git fetch (拉取远程仓库引用到本地版本库)&lt;/li&gt;
+    &lt;li&gt;git pull (拉取远程仓库引用到本地工作区)&lt;/li&gt;
+    &lt;li&gt;git push (推送本地引用)&lt;/li&gt;
   &lt;/ul&gt;
 &lt;/blockquote&gt;
 
@@ -49,12 +53,81 @@ git add .
 git commit -m &quot;update .gitignore&quot;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
   &lt;/li&gt;
+  &lt;li&gt;冲突处理流程：
+    &lt;ol&gt;
+      &lt;li&gt;本地进行了一次提交操作，这个时候我们准备推送到远程仓库，当执行推送操作时GIT提示报错，要我们先执行拉取操作。
+        &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  ➜  GitTest git:(master) git push
+  To https://github.com/liuqiang-code/GitTest.git
+   ! [rejected]        master -&amp;gt; master (non-fast-forward)
+  error: failed to push some refs to 'https://github.com/liuqiang-code/GitTest.git'
+  hint: Updates were rejected because the tip of your current branch is behind
+  hint: its remote counterpart. Integrate the remote changes (e.g.
+  hint: 'git pull ...') before pushing again.
+  hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+  ➜  GitTest git:(master)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
+      &lt;/li&gt;
+      &lt;li&gt;根据Git提示执行git pull操作
+        &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  ➜  GitTest git:(master) git pull
+  Auto-merging hello.txt
+  CONFLICT (content): Merge conflict in hello.txt
+  Automatic merge failed; fix conflicts and then commit the result.
+  ➜  GitTest git:(master) ✗ 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
+      &lt;/li&gt;
+      &lt;li&gt;GIT提示：尝试自动合并hello.txt文件失败，提示要我们手动解决冲突然后再次提交。&lt;/li&gt;
+      &lt;li&gt;根据提示，首先查看冲突文件 hello.txt，GIT使用 «««&amp;lt; ======= »»»&amp;gt; 标记冲突行。«««&amp;lt; HEAD 和 ======= 之间的是本地记录，而 ======= 和 »»»&amp;gt; c53ee6465cc033d1eb38c333612bc98e444afe1f 之间的是远程记录。
+        &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  ➜  GitTest git:(master) ✗ cat hello.txt
+  hello git
+  &amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
+  hello weiwei
+  =======
+  BigStrong is Handsome
+  &amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt; c53ee6465cc033d1eb38c333612bc98e444afe1f
+  ➜  GitTest git:(master) ✗
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
+      &lt;/li&gt;
+      &lt;li&gt;然后我们再根据实际要求手动处理冲突，当我们手动处理完冲突后使用git status 查看版本库状态时会提示我们再次执行add和commit操作，执行完commit操作后提示fix conflicts，GIT默认（是否解决只有自己知道）我们解决了冲突，因为我们执行了commit操作，最后查看状态提示执行推送操作。
+        &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  ➜  GitTest git:(master) ✗ cat hello.txt
+  hello git
+  hello weiwei and BigStrong is Handsome
+  ➜  GitTest git:(master) ✗ git status
+  On branch master
+  Your branch and 'origin/master' have diverged,
+  and have 1 and 1 different commits each, respectively.
+    (use &quot;git pull&quot; to merge the remote branch into yours)
+  You have unmerged paths.
+    (fix conflicts and run &quot;git commit&quot;)
+    (use &quot;git merge --abort&quot; to abort the merge)
+  Unmerged paths:
+    (use &quot;git add &amp;lt;file&amp;gt;...&quot; to mark resolution)
+ both modified:   hello.txt
+  no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+  ➜  GitTest git:(master) ✗ git add hello.txt
+  ➜  GitTest git:(master) ✗ git commit -m &quot;fix conflicts&quot;
+  [master 6d705a0] fix conflicts
+  ➜  GitTest git:(master) git status
+  On branch master
+  Your branch is ahead of 'origin/master' by 2 commits.
+    (use &quot;git push&quot; to publish your local commits)
+  nothing to commit, working tree clean
+  ➜  GitTest git:(master) git push
+  Counting objects: 6, done.
+  Delta compression using up to 4 threads.
+  Compressing objects: 100% (2/2), done.
+  Writing objects: 100% (6/6), 551 bytes | 551.00 KiB/s, done.
+  Total 6 (delta 0), reused 0 (delta 0)
+  To https://github.com/liuqiang-code/GitTest.git
+c53ee64..6d705a0  master -&amp;gt; master
+  ➜  GitTest git:(master)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
+      &lt;/li&gt;
+      &lt;li&gt;总结：养成使用 git status 命令习惯。学会看提示信息，GIT 的提示信息非常友善，利用提示信息可以很大的提高工作效率。
+&lt;br /&gt;
+转载请注明：&lt;a href=&quot;https://liuqiang-code.github.io/&quot;&gt;刘强的博客&lt;/a&gt; » &lt;a href=&quot;https://liuqiang-code.github.io/2020/07/GitCourse/&quot;&gt;点击阅读原文&lt;/a&gt;&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
 &lt;/ul&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;转载请注明：&lt;a href=&quot;https://liuqiang-code.github.io/&quot;&gt;刘强的博客&lt;/a&gt; » &lt;a href=&quot;https://liuqiang-code.github.io/2020/07/GitCourse/&quot;&gt;点击阅读原文&lt;/a&gt;&lt;/p&gt;
-
 </description>
         <pubDate>Sun, 12 Jul 2020 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/2020/07/GitCourse/</link>
