@@ -5,8 +5,8 @@
     <description>欢迎来到我的个人博客~</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 18 Jul 2020 15:12:48 +0800</pubDate>
-    <lastBuildDate>Sat, 18 Jul 2020 15:12:48 +0800</lastBuildDate>
+    <pubDate>Sat, 18 Jul 2020 15:21:55 +0800</pubDate>
+    <lastBuildDate>Sat, 18 Jul 2020 15:21:55 +0800</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
@@ -122,12 +122,13 @@ c53ee64..6d705a0  master -&amp;gt; master
   ➜  GitTest git:(master)
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
       &lt;/li&gt;
-      &lt;li&gt;总结：养成使用 git status 命令习惯。学会看提示信息，GIT 的提示信息非常友善，利用提示信息可以很大的提高工作效率。
-&lt;br /&gt;
-转载请注明：&lt;a href=&quot;https://liuqiang-code.github.io/&quot;&gt;刘强的博客&lt;/a&gt; » &lt;a href=&quot;https://liuqiang-code.github.io/2020/07/GitCourse/&quot;&gt;点击阅读原文&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;总结：养成使用 git status 命令习惯。学会看提示信息，GIT 的提示信息非常友善，利用提示信息可以很大的提高工作效率。&lt;/li&gt;
     &lt;/ol&gt;
   &lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;p&gt;&lt;br /&gt;
+转载请注明：&lt;a href=&quot;https://liuqiang-code.github.io/&quot;&gt;刘强的博客&lt;/a&gt; » &lt;a href=&quot;https://liuqiang-code.github.io/2020/07/GitCourse/&quot;&gt;点击阅读原文&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Sun, 12 Jul 2020 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/2020/07/GitCourse/</link>

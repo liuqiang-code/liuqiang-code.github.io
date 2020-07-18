@@ -116,5 +116,6 @@ git commit -m "update .gitignore"
 	➜  GitTest git:(master)
 	````
 	6. 总结：养成使用 git status 命令习惯。学会看提示信息，GIT 的提示信息非常友善，利用提示信息可以很大的提高工作效率。
+	
 <br>
 转载请注明：[刘强的博客](https://liuqiang-code.github.io/) » [点击阅读原文](https://liuqiang-code.github.io/2020/07/GitCourse/)
