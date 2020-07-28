@@ -6,17 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>Git笔录</title>
-  <meta name="description" content="介绍">
+  <title>SpringBoot默认存储路径带来的BUG</title>
+  <meta name="description" content="背景">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Git笔录">
-  <meta name="twitter:description" content="介绍">
+  <meta name="twitter:title" content="SpringBoot默认存储路径带来的BUG">
+  <meta name="twitter:description" content="背景">
   
   <meta property="og:type" content="article">
-  <meta property="og:title" content="Git笔录">
-  <meta property="og:description" content="介绍">
+  <meta property="og:title" content="SpringBoot默认存储路径带来的BUG">
+  <meta property="og:description" content="背景">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link rel="canonical" href="http://localhost:4000/2020/07/GitCourse/">
+  <link rel="canonical" href="http://localhost:4000/2020/07/Tomcat2SpringBootBug/">
   <link rel="alternate" type="application/rss+xml" title="刘强" href="http://localhost:4000/feed.xml">
   
   <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
@@ -160,10 +160,10 @@
 
 <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
-    <h1 class="post-title">Git笔录</h1>
+    <h1 class="post-title">SpringBoot默认存储路径带来的BUG</h1>
     <div class="post-meta">
       <img src="/images/calendar.png" width="20px"/> 
-      <time datetime="2020-07-12 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2020-07-12</time>  
+      <time datetime="2020-07-28 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2020-07-28</time>  
 
       <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
     </p>
@@ -173,137 +173,47 @@
   
     <h2 class="post-title">目录</h2>
     <ul>
-  <li><a href="#介绍">介绍</a></li>
-  <li><a href="#安装git">安装Git</a></li>
-  <li><a href="#配置git">配置Git</a></li>
-  <li><a href="#常用命令">常用命令：</a></li>
-  <li><a href="#常见问题">常见问题：</a>
-    <ul>
-      <li><a href="#配置了gitignore的忽略项但是不起作用">配置了.gitignore的忽略项但是不起作用</a></li>
-      <li><a href="#冲突处理流程">冲突处理流程：</a></li>
-    </ul>
-  </li>
+  <li><a href="#背景">背景</a></li>
+  <li><a href="#原因">原因</a></li>
+  <li><a href="#分析">分析</a></li>
+  <li><a href="#处理方案">处理方案</a></li>
+  <li><a href="#总结">总结</a></li>
 </ul>
 
   
 
   <section class="post">
-    <h3 id="介绍">介绍</h3>
+    <h3 id="背景">背景</h3>
 
-<p>　　同生活中的许多伟大事物一样，Git 诞生于一个极富纷争大举创新的年代。</p>
+<p>　 接到消息说线上一直运行的一个平台出现了Bug，需要排查原因。收到这个消息的时候一脸惊讶，为什么好好运行的平台会突然出问题。排查运行日志发现是无法读取到文件。核实得知线上的工程以前是以war包的形式运行在Tomcat容器中而最近改成了jar包独立运行。</p>
 
-<p>　　Git的作者Linus，同样是Linux 的缔造者，为了高度推举开源的大旗和更好的开发和管理Linux，开发出了Git这个优秀的版本版本控制系统</p>
+<h3 id="原因">原因</h3>
 
-<p>　　作为一位开发者，熟悉掌握Git是一项非常实用的技能，合理高效的管理代码，不仅可以为我们节约时间，还能提高编码的效率。现在基于Git的版本控制软件有很多，比如：Sourcetree、TortoiseGit等工具，但是本人还是推荐使用命令行操作，因为只有熟练的使用命令行，才能更好的理解底层原理。</p>
-
-<h3 id="安装git">安装Git</h3>
-<p>参考<a href="https://git-scm.com/book/zh/v2/%E8%B5%B7%E6%AD%A5-%E5%AE%89%E8%A3%85-Git">官方安装教程</a></p>
-
-<h3 id="配置git">配置Git</h3>
-
-<p>安装完成后，还需要最后一步设置，在命令行输入：</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git config --global user.name "User Name"
-git config --global user.email "email@example.com"
+<p>经过排查定位错误代码为：</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  ServletContext servletContext = webApplicationConnect.getServletContext();
 </code></pre></div></div>
-<p>–global：使用该参数时，Git会修改 ~/.gitconfig 或 ~/.config/git/config 文件里面的用户名和邮箱地址。该配置会默认作用于所有Git管理的仓库，如果需要更改某个仓库下的用户名和邮箱信息，可以使用 git config 命令，不携带 –global 选项，也可以手动修改 .git/config 文件里面用户和邮箱信息。</p>
+<p>在Linux服务器上SpringBoot通过该方式获取的默认存储路径为 /tmp</p>
 
-<h3 id="常用命令">常用命令：</h3>
+<p><img src="/images/posts/Tomcat2SpringBootBug/image1.png" /></p>
 
-<blockquote>
-  <ul>
-    <li>git init（创建Git版本库）</li>
-    <li>git add .（全部添加到暂存区）</li>
-    <li>git commit -m ‘commit message’（提交暂存区的记录到本地仓库）</li>
-    <li>git config (配置和获取Git环境参数)</li>
-    <li>git status (查看版本库状态)</li>
-    <li>git fetch (拉取远程仓库引用到本地版本库)</li>
-    <li>git pull (拉取远程仓库引用到本地工作区)</li>
-    <li>git push (推送本地引用)</li>
-    <li>git checkout (检出操作)</li>
-  </ul>
-</blockquote>
+<h3 id="分析">分析</h3>
 
-<h3 id="常见问题">常见问题：</h3>
+<ul>
+  <li>Linux 重启时会自动清理该目录，同时也存在一个定时任务清理，显然文件保存该目录很不合理。</li>
+  <li>SpringBoot工程重启后获取的路径是不同的，这就导致每次重启工程后获取文件操作出错。</li>
+</ul>
 
-<h4 id="配置了gitignore的忽略项但是不起作用">配置了.gitignore的忽略项但是不起作用</h4>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 清理本地库的缓存，并且重新添加版本库。
-git rm -r --cached .
-git add .
-git commit -m "update .gitignore"
-</code></pre></div></div>
+<h3 id="处理方案">处理方案</h3>
+<p>　 在SpringBoot工程的application.propertis配置文件中添加一个文件存储路径，所有有关文件的操作都是以该路径为基准。</p>
 
-<h4 id="冲突处理流程">冲突处理流程：</h4>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. 本地进行了一次提交操作，这个时候我们准备推送到远程仓库，当执行推送操作时GIT提示报错，要我们先执行拉取操作。
-````
-➜  GitTest git:(master) git push
-To https://github.com/liuqiang-code/GitTest.git
- ! [rejected]        master -&gt; master (non-fast-forward)
-error: failed to push some refs to 'https://github.com/liuqiang-code/GitTest.git'
-hint: Updates were rejected because the tip of your current branch is behind
-hint: its remote counterpart. Integrate the remote changes (e.g.
-hint: 'git pull ...') before pushing again.
-hint: See the 'Note about fast-forwards' in 'git push --help' for details.
-➜  GitTest git:(master)
-````
-2. 根据Git提示执行git pull操作
-````
-➜  GitTest git:(master) git pull
-Auto-merging hello.txt
-CONFLICT (content): Merge conflict in hello.txt
-Automatic merge failed; fix conflicts and then commit the result.
-➜  GitTest git:(master) ✗ 
-````
-3. GIT提示：尝试自动合并hello.txt文件失败，提示要我们手动解决冲突然后再次提交。
-4. 根据提示，首先查看冲突文件 hello.txt，GIT使用 &lt;&lt;&lt;&lt;&lt;&lt;&lt; ======= &gt;&gt;&gt;&gt;&gt;&gt;&gt; 标记冲突行。&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD 和 ======= 之间的是本地记录，而 ======= 和 &gt;&gt;&gt;&gt;&gt;&gt;&gt; c53ee6465cc033d1eb38c333612bc98e444afe1f 之间的是远程记录。
-````
-➜  GitTest git:(master) ✗ cat hello.txt
-hello git
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
-hello weiwei
-=======
-BigStrong is Handsome
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; c53ee6465cc033d1eb38c333612bc98e444afe1f
-➜  GitTest git:(master) ✗
-````
-5. 然后我们再根据实际要求手动处理冲突，当我们手动处理完冲突后使用git status 查看版本库状态时会提示我们再次执行add和commit操作，执行完commit操作后提示fix conflicts，GIT默认（是否解决只有自己知道）我们解决了冲突，因为我们执行了commit操作，最后查看状态提示执行推送操作。
-````
-➜  GitTest git:(master) ✗ cat hello.txt
-hello git
-hello weiwei and BigStrong is Handsome
-➜  GitTest git:(master) ✗ git status
-On branch master
-Your branch and 'origin/master' have diverged,
-and have 1 and 1 different commits each, respectively.
-  (use "git pull" to merge the remote branch into yours)
-You have unmerged paths.
-  (fix conflicts and run "git commit")
-  (use "git merge --abort" to abort the merge)
-Unmerged paths:
-  (use "git add &lt;file&gt;..." to mark resolution)
-	both modified:   hello.txt
-no changes added to commit (use "git add" and/or "git commit -a")
-➜  GitTest git:(master) ✗ git add hello.txt
-➜  GitTest git:(master) ✗ git commit -m "fix conflicts"
-[master 6d705a0] fix conflicts
-➜  GitTest git:(master) git status
-On branch master
-Your branch is ahead of 'origin/master' by 2 commits.
-  (use "git push" to publish your local commits)
-nothing to commit, working tree clean
-➜  GitTest git:(master) git push
-Counting objects: 6, done.
-Delta compression using up to 4 threads.
-Compressing objects: 100% (2/2), done.
-Writing objects: 100% (6/6), 551 bytes | 551.00 KiB/s, done.
-Total 6 (delta 0), reused 0 (delta 0)
-To https://github.com/liuqiang-code/GitTest.git
-   	c53ee64..6d705a0  master -&gt; master
-````
-6. 总结：养成使用 git status 命令习惯。学会看提示信息，GIT 的提示信息非常友善，利用提示信息可以很大的提高工作效率。
-</code></pre></div></div>
+<h3 id="总结">总结</h3>
+<ul>
+  <li>根据系统运行日志排除问题</li>
+  <li>当使用一项新技术时需要对该技术有一定的掌控度，切记盲目使用。</li>
+</ul>
 
 <p><br />
-转载请注明：<a href="https://liuqiang-code.github.io/">刘强的博客</a> » <a href="https://liuqiang-code.github.io/2020/07/GitCourse/">点击阅读原文</a></p>
+转载请注明：<a href="https://liuqiang-code.github.io/">刘强的博客</a> » <a href="https://liuqiang-code.github.io/2020/28/Tomcat2SpringBootBug/">点击阅读原文</a></p>
 
   </section>
 
@@ -372,11 +282,11 @@ To https://github.com/liuqiang-code/GitTest.git
 
        <ul class="pager">
         
-        
-        <li class="next">
-            <a href="/2020/07/Tomcat2SpringBootBug/" data-toggle="tooltip" data-placement="top" title="SpringBoot默认存储路径带来的BUG">下一篇：  <span>SpringBoot默认存储路径带来的BUG</span>
+        <li class="previous">
+            <a href="/2020/07/GitCourse/" data-toggle="tooltip" data-placement="top" title="Git笔录">上一篇：  <span>Git笔录</span>
             </a>
         </li>
+        
         
     </ul>
 </section>
@@ -388,8 +298,8 @@ To https://github.com/liuqiang-code/GitTest.git
     <script>
     
     var disqus_config = function () {
-        this.page.url = "http://localhost:4000/2020/07/GitCourse/";
-        this.page.identifier = "/2020/07/GitCourse/";
+        this.page.url = "http://localhost:4000/2020/07/Tomcat2SpringBootBug/";
+        this.page.identifier = "/2020/07/Tomcat2SpringBootBug/";
     };
     var disqus_shortname = 'leopard';
     

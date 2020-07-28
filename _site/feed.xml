@@ -5,12 +5,55 @@
     <description>欢迎来到我的个人博客~</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 18 Jul 2020 15:21:55 +0800</pubDate>
-    <lastBuildDate>Sat, 18 Jul 2020 15:21:55 +0800</lastBuildDate>
+    <pubDate>Wed, 29 Jul 2020 00:49:14 +0800</pubDate>
+    <lastBuildDate>Wed, 29 Jul 2020 00:49:14 +0800</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
-        <title>Git教程</title>
+        <title>SpringBoot默认存储路径带来的BUG</title>
+        <description>&lt;h3 id=&quot;背景&quot;&gt;背景&lt;/h3&gt;
+
+&lt;p&gt;　 接到消息说线上一直运行的一个平台出现了Bug，需要排查原因。收到这个消息的时候一脸惊讶，为什么好好运行的平台会突然出问题。排查运行日志发现是无法读取到文件。核实得知线上的工程以前是以war包的形式运行在Tomcat容器中而最近改成了jar包独立运行。&lt;/p&gt;
+
+&lt;h3 id=&quot;原因&quot;&gt;原因&lt;/h3&gt;
+
+&lt;p&gt;经过排查定位错误代码为：&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  ServletContext servletContext = webApplicationConnect.getServletContext();
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;在Linux服务器上SpringBoot通过该方式获取的默认存储路径为 /tmp&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/posts/Tomcat2SpringBootBug/image1.png&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;分析&quot;&gt;分析&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Linux 重启时会自动清理该目录，同时也存在一个定时任务清理，显然文件保存该目录很不合理。&lt;/li&gt;
+  &lt;li&gt;SpringBoot工程重启后获取的路径是不同的，这就导致每次重启工程后获取文件操作出错。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;处理方案&quot;&gt;处理方案&lt;/h3&gt;
+&lt;p&gt;　 在SpringBoot工程的application.propertis配置文件中添加一个文件存储路径，所有有关文件的操作都是以该路径为基准。&lt;/p&gt;
+
+&lt;h3 id=&quot;总结&quot;&gt;总结&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;根据系统运行日志排除问题&lt;/li&gt;
+  &lt;li&gt;当使用一项新技术时需要对该技术有一定的掌控度，切记盲目使用。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;br /&gt;
+转载请注明：&lt;a href=&quot;https://liuqiang-code.github.io/&quot;&gt;刘强的博客&lt;/a&gt; » &lt;a href=&quot;https://liuqiang-code.github.io/2020/28/Tomcat2SpringBootBug/&quot;&gt;点击阅读原文&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Tue, 28 Jul 2020 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2020/07/Tomcat2SpringBootBug/</link>
+        <guid isPermaLink="true">http://localhost:4000/2020/07/Tomcat2SpringBootBug/</guid>
+        
+        <category>Java</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Git笔录</title>
         <description>&lt;h3 id=&quot;介绍&quot;&gt;介绍&lt;/h3&gt;
 
 &lt;p&gt;　　同生活中的许多伟大事物一样，Git 诞生于一个极富纷争大举创新的年代。&lt;/p&gt;
@@ -42,90 +85,88 @@ git config --global user.email &quot;email@example.com&quot;
     &lt;li&gt;git fetch (拉取远程仓库引用到本地版本库)&lt;/li&gt;
     &lt;li&gt;git pull (拉取远程仓库引用到本地工作区)&lt;/li&gt;
     &lt;li&gt;git push (推送本地引用)&lt;/li&gt;
+    &lt;li&gt;git checkout (检出操作)&lt;/li&gt;
   &lt;/ul&gt;
 &lt;/blockquote&gt;
 
 &lt;h3 id=&quot;常见问题&quot;&gt;常见问题：&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;配置了.gitignore的忽略项但是不起作用，解决办法：清理本地库的缓存，并且重新添加版本库。
-    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git rm -r --cached .
+
+&lt;h4 id=&quot;配置了gitignore的忽略项但是不起作用&quot;&gt;配置了.gitignore的忽略项但是不起作用&lt;/h4&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# 清理本地库的缓存，并且重新添加版本库。
+git rm -r --cached .
 git add .
 git commit -m &quot;update .gitignore&quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;冲突处理流程：
-    &lt;ol&gt;
-      &lt;li&gt;本地进行了一次提交操作，这个时候我们准备推送到远程仓库，当执行推送操作时GIT提示报错，要我们先执行拉取操作。
-        &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  ➜  GitTest git:(master) git push
-  To https://github.com/liuqiang-code/GitTest.git
-   ! [rejected]        master -&amp;gt; master (non-fast-forward)
-  error: failed to push some refs to 'https://github.com/liuqiang-code/GitTest.git'
-  hint: Updates were rejected because the tip of your current branch is behind
-  hint: its remote counterpart. Integrate the remote changes (e.g.
-  hint: 'git pull ...') before pushing again.
-  hint: See the 'Note about fast-forwards' in 'git push --help' for details.
-  ➜  GitTest git:(master)
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
-      &lt;/li&gt;
-      &lt;li&gt;根据Git提示执行git pull操作
-        &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  ➜  GitTest git:(master) git pull
-  Auto-merging hello.txt
-  CONFLICT (content): Merge conflict in hello.txt
-  Automatic merge failed; fix conflicts and then commit the result.
-  ➜  GitTest git:(master) ✗ 
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
-      &lt;/li&gt;
-      &lt;li&gt;GIT提示：尝试自动合并hello.txt文件失败，提示要我们手动解决冲突然后再次提交。&lt;/li&gt;
-      &lt;li&gt;根据提示，首先查看冲突文件 hello.txt，GIT使用 «««&amp;lt; ======= »»»&amp;gt; 标记冲突行。«««&amp;lt; HEAD 和 ======= 之间的是本地记录，而 ======= 和 »»»&amp;gt; c53ee6465cc033d1eb38c333612bc98e444afe1f 之间的是远程记录。
-        &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  ➜  GitTest git:(master) ✗ cat hello.txt
-  hello git
-  &amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
-  hello weiwei
-  =======
-  BigStrong is Handsome
-  &amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt; c53ee6465cc033d1eb38c333612bc98e444afe1f
-  ➜  GitTest git:(master) ✗
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
-      &lt;/li&gt;
-      &lt;li&gt;然后我们再根据实际要求手动处理冲突，当我们手动处理完冲突后使用git status 查看版本库状态时会提示我们再次执行add和commit操作，执行完commit操作后提示fix conflicts，GIT默认（是否解决只有自己知道）我们解决了冲突，因为我们执行了commit操作，最后查看状态提示执行推送操作。
-        &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  ➜  GitTest git:(master) ✗ cat hello.txt
-  hello git
-  hello weiwei and BigStrong is Handsome
-  ➜  GitTest git:(master) ✗ git status
-  On branch master
-  Your branch and 'origin/master' have diverged,
-  and have 1 and 1 different commits each, respectively.
-    (use &quot;git pull&quot; to merge the remote branch into yours)
-  You have unmerged paths.
-    (fix conflicts and run &quot;git commit&quot;)
-    (use &quot;git merge --abort&quot; to abort the merge)
-  Unmerged paths:
-    (use &quot;git add &amp;lt;file&amp;gt;...&quot; to mark resolution)
- both modified:   hello.txt
-  no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
-  ➜  GitTest git:(master) ✗ git add hello.txt
-  ➜  GitTest git:(master) ✗ git commit -m &quot;fix conflicts&quot;
-  [master 6d705a0] fix conflicts
-  ➜  GitTest git:(master) git status
-  On branch master
-  Your branch is ahead of 'origin/master' by 2 commits.
-    (use &quot;git push&quot; to publish your local commits)
-  nothing to commit, working tree clean
-  ➜  GitTest git:(master) git push
-  Counting objects: 6, done.
-  Delta compression using up to 4 threads.
-  Compressing objects: 100% (2/2), done.
-  Writing objects: 100% (6/6), 551 bytes | 551.00 KiB/s, done.
-  Total 6 (delta 0), reused 0 (delta 0)
-  To https://github.com/liuqiang-code/GitTest.git
-c53ee64..6d705a0  master -&amp;gt; master
-  ➜  GitTest git:(master)
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
-      &lt;/li&gt;
-      &lt;li&gt;总结：养成使用 git status 命令习惯。学会看提示信息，GIT 的提示信息非常友善，利用提示信息可以很大的提高工作效率。&lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;冲突处理流程&quot;&gt;冲突处理流程：&lt;/h4&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1. 本地进行了一次提交操作，这个时候我们准备推送到远程仓库，当执行推送操作时GIT提示报错，要我们先执行拉取操作。
+````
+➜  GitTest git:(master) git push
+To https://github.com/liuqiang-code/GitTest.git
+ ! [rejected]        master -&amp;gt; master (non-fast-forward)
+error: failed to push some refs to 'https://github.com/liuqiang-code/GitTest.git'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. Integrate the remote changes (e.g.
+hint: 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+➜  GitTest git:(master)
+````
+2. 根据Git提示执行git pull操作
+````
+➜  GitTest git:(master) git pull
+Auto-merging hello.txt
+CONFLICT (content): Merge conflict in hello.txt
+Automatic merge failed; fix conflicts and then commit the result.
+➜  GitTest git:(master) ✗ 
+````
+3. GIT提示：尝试自动合并hello.txt文件失败，提示要我们手动解决冲突然后再次提交。
+4. 根据提示，首先查看冲突文件 hello.txt，GIT使用 &amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; ======= &amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt; 标记冲突行。&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD 和 ======= 之间的是本地记录，而 ======= 和 &amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt; c53ee6465cc033d1eb38c333612bc98e444afe1f 之间的是远程记录。
+````
+➜  GitTest git:(master) ✗ cat hello.txt
+hello git
+&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
+hello weiwei
+=======
+BigStrong is Handsome
+&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt; c53ee6465cc033d1eb38c333612bc98e444afe1f
+➜  GitTest git:(master) ✗
+````
+5. 然后我们再根据实际要求手动处理冲突，当我们手动处理完冲突后使用git status 查看版本库状态时会提示我们再次执行add和commit操作，执行完commit操作后提示fix conflicts，GIT默认（是否解决只有自己知道）我们解决了冲突，因为我们执行了commit操作，最后查看状态提示执行推送操作。
+````
+➜  GitTest git:(master) ✗ cat hello.txt
+hello git
+hello weiwei and BigStrong is Handsome
+➜  GitTest git:(master) ✗ git status
+On branch master
+Your branch and 'origin/master' have diverged,
+and have 1 and 1 different commits each, respectively.
+  (use &quot;git pull&quot; to merge the remote branch into yours)
+You have unmerged paths.
+  (fix conflicts and run &quot;git commit&quot;)
+  (use &quot;git merge --abort&quot; to abort the merge)
+Unmerged paths:
+  (use &quot;git add &amp;lt;file&amp;gt;...&quot; to mark resolution)
+	both modified:   hello.txt
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+➜  GitTest git:(master) ✗ git add hello.txt
+➜  GitTest git:(master) ✗ git commit -m &quot;fix conflicts&quot;
+[master 6d705a0] fix conflicts
+➜  GitTest git:(master) git status
+On branch master
+Your branch is ahead of 'origin/master' by 2 commits.
+  (use &quot;git push&quot; to publish your local commits)
+nothing to commit, working tree clean
+➜  GitTest git:(master) git push
+Counting objects: 6, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (6/6), 551 bytes | 551.00 KiB/s, done.
+Total 6 (delta 0), reused 0 (delta 0)
+To https://github.com/liuqiang-code/GitTest.git
+   	c53ee64..6d705a0  master -&amp;gt; master
+````
+6. 总结：养成使用 git status 命令习惯。学会看提示信息，GIT 的提示信息非常友善，利用提示信息可以很大的提高工作效率。
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;br /&gt;
 转载请注明：&lt;a href=&quot;https://liuqiang-code.github.io/&quot;&gt;刘强的博客&lt;/a&gt; » &lt;a href=&quot;https://liuqiang-code.github.io/2020/07/GitCourse/&quot;&gt;点击阅读原文&lt;/a&gt;&lt;/p&gt;

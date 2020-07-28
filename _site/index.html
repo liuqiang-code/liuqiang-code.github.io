@@ -159,7 +159,28 @@
   <ol class="post-list">
     
     <li>
-      <h2 class="post-list__post-title post-title"><a href="/2020/07/GitCourse/" title="访问 Git教程">Git教程</a></h2>
+      <h2 class="post-list__post-title post-title"><a href="/2020/07/Tomcat2SpringBootBug/" title="访问 SpringBoot默认存储路径带来的BUG">SpringBoot默认存储路径带来的BUG</a></h2>
+      <p class="excerpt">背景　 接到消息说线上一直运行的一个平台出现了Bug，需要排查原因。收到这个消息的时候一脸惊讶，为什么好好运行的平台会突然出问题。排查运行日志发现是无法读取到文件。核实得知线上的工程以前是以war包的形式运行在Tomcat容器中而最近改成了jar包独立运行。原因经过排查定位错误代码为：  ServletContext servletContext = webApplicationConnect.getServletContext();在Linux服务器上SpringBoot通过该方式获取的...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2020-07-28 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2020-07-28</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">Java</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2020/07/Tomcat2SpringBootBug/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2020/07/GitCourse/" title="访问 Git笔录">Git笔录</a></h2>
       <p class="excerpt">介绍　　同生活中的许多伟大事物一样，Git 诞生于一个极富纷争大举创新的年代。　　Git的作者Linus，同样是Linux 的缔造者，为了高度推举开源的大旗和更好的开发和管理Linux，开发出了Git这个优秀的版本版本控制系统　　作为一位开发者，熟悉掌握Git是一项非常实用的技能，合理高效的管理代码，不仅可以为我们节约时间，还能提高编码的效率。现在基于Git的版本控制软件有很多，比如：Sourcetree、TortoiseGit等工具，但是本人还是推荐使用命令行操作，因为只有熟练的使用命令...&hellip;</p>
       <div class="post-list__meta">        
         <time datetime="2020-07-12 00:00:00 +0800" class="post-list__meta--date date">

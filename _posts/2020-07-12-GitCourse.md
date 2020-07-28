@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Git教程"
+title: "Git笔录"
 date: 2020-07-12   
 tag: Git 
 ---
@@ -36,18 +36,21 @@ git config --global user.email "email@example.com"
 >* git status (查看版本库状态)
 >* git fetch (拉取远程仓库引用到本地版本库)
 >* git pull (拉取远程仓库引用到本地工作区)  
->* git push (推送本地引用) 
+>* git push (推送本地引用)
+>* git checkout (检出操作) 
 
 
 ### 常见问题： 
-- 配置了.gitignore的忽略项但是不起作用，解决办法：清理本地库的缓存，并且重新添加版本库。
+
+#### 配置了.gitignore的忽略项但是不起作用
 ````
+# 清理本地库的缓存，并且重新添加版本库。
 git rm -r --cached .
 git add .
 git commit -m "update .gitignore"
 ````
 
-- 冲突处理流程：
+#### 冲突处理流程：
 	1. 本地进行了一次提交操作，这个时候我们准备推送到远程仓库，当执行推送操作时GIT提示报错，要我们先执行拉取操作。
 	````
 	➜  GitTest git:(master) git push
@@ -112,8 +115,7 @@ git commit -m "update .gitignore"
 	Writing objects: 100% (6/6), 551 bytes | 551.00 KiB/s, done.
 	Total 6 (delta 0), reused 0 (delta 0)
 	To https://github.com/liuqiang-code/GitTest.git
-	   c53ee64..6d705a0  master -> master
-	➜  GitTest git:(master)
+	   	c53ee64..6d705a0  master -> master
 	````
 	6. 总结：养成使用 git status 命令习惯。学会看提示信息，GIT 的提示信息非常友善，利用提示信息可以很大的提高工作效率。
 	

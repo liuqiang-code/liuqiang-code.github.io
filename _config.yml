@@ -8,6 +8,9 @@ avatarTitle: BigStrong
 avatarDesc: Jave / 记录生活
 url: "https://liuqiang-code.github.io/"
 
+# 博客是否自动生成目录，false为不生成
+enableToc: true
+
 # Comment
 comment:
     disqus: leopard
