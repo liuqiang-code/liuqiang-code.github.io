@@ -37,7 +37,9 @@ git config --global user.email "email@example.com"
 >* git fetch (拉取远程仓库引用到本地版本库)
 >* git pull (拉取远程仓库引用到本地工作区)  
 >* git push (推送本地引用)
->* git checkout (检出操作) 
+>* git checkout (检出操作)
+>* git reflog (查看分支的操作记录) 
+>* git stash (暂存本地修改) 
 
 
 ### 常见问题： 
@@ -118,6 +120,62 @@ git commit -m "update .gitignore"
 	   	c53ee64..6d705a0  master -> master
 	````
 	6. 总结：养成使用 git status 命令习惯。学会看提示信息，GIT 的提示信息非常友善，利用提示信息可以很大的提高工作效率。
+
+#### 远程分支有提交，本地修改未提交可以直接git pull吗？
+1、首先通过 git status 查看本地状态
+````
+➜  GitTest git:(master) git status
+On branch master
+Your branch is behind 'origin/master' by 2 commits, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+
+nothing to commit, working tree clean
+```` 
+2、修改文件并且查看状态
+````
+➜  GitTest git:(master) ll
+total 8
+-rw-r--r--  1 apple  staff    23B  8 23 10:32 hello.txt
+➜  GitTest git:(master) echo 'modify file' >> hello.txt
+➜  GitTest git:(master) ✗
+➜  GitTest git:(master) ✗
+➜  GitTest git:(master) ✗ git status
+On branch master
+Your branch is behind 'origin/master' by 2 commits, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   hello.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+````
+3、不提交修改，直接使用git pull拉取提交
+````
+➜  GitTest git:(master) ✗ git status
+On branch master
+Your branch is behind 'origin/master' by 2 commits, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   hello.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+➜  GitTest git:(master) ✗ git pull
+Updating 5be3084..6d705a0
+error: Your local changes to the following files would be overwritten by merge:
+	hello.txt
+Please commit your changes or stash them before you merge.
+Aborting
+➜  GitTest git:(master) ✗
+````
+4、总结：git会提示操作用户本地修改未提交直接git pull时本地修改会被覆盖，请先commit或者stash修改。
+
 	
 <br>
 转载请注明：[刘强的博客](https://liuqiang-code.github.io/) » [点击阅读原文](https://liuqiang-code.github.io/2020/07/GitCourse/)

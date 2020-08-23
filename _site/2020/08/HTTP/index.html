@@ -6,17 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>Git笔录</title>
-  <meta name="description" content="介绍">
+  <title>有关爬虫的HTTP网络基础</title>
+  <meta name="description" content="背景">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Git笔录">
-  <meta name="twitter:description" content="介绍">
+  <meta name="twitter:title" content="有关爬虫的HTTP网络基础">
+  <meta name="twitter:description" content="背景">
   
   <meta property="og:type" content="article">
-  <meta property="og:title" content="Git笔录">
-  <meta property="og:description" content="介绍">
+  <meta property="og:title" content="有关爬虫的HTTP网络基础">
+  <meta property="og:description" content="背景">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link rel="canonical" href="http://localhost:4000/2020/07/GitCourse/">
+  <link rel="canonical" href="http://localhost:4000/2020/08/HTTP/">
   <link rel="alternate" type="application/rss+xml" title="刘强" href="http://localhost:4000/feed.xml">
   
   <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
@@ -160,10 +160,10 @@
 
 <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
-    <h1 class="post-title">Git笔录</h1>
+    <h1 class="post-title">有关爬虫的HTTP网络基础</h1>
     <div class="post-meta">
       <img src="/images/calendar.png" width="20px"/> 
-      <time datetime="2020-07-12 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2020-07-12</time>  
+      <time datetime="2020-08-23 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2020-08-23</time>  
 
       <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
     </p>
@@ -173,192 +173,180 @@
   
     <h2 class="post-title">目录</h2>
     <ul>
-  <li><a href="#介绍">介绍</a></li>
-  <li><a href="#安装git">安装Git</a></li>
-  <li><a href="#配置git">配置Git</a></li>
-  <li><a href="#常用命令">常用命令：</a></li>
-  <li><a href="#常见问题">常见问题：</a>
-    <ul>
-      <li><a href="#配置了gitignore的忽略项但是不起作用">配置了.gitignore的忽略项但是不起作用</a></li>
-      <li><a href="#冲突处理流程">冲突处理流程：</a></li>
-      <li><a href="#远程分支有提交本地修改未提交可以直接git-pull吗">远程分支有提交，本地修改未提交可以直接git pull吗？</a></li>
-    </ul>
-  </li>
+  <li><a href="#背景">背景</a></li>
+  <li><a href="#url和uri">URL和URI</a></li>
+  <li><a href="#超文本">超文本</a></li>
+  <li><a href="#http和https">HTTP和HTTPS</a></li>
+  <li><a href="#http请求过程">HTTP请求过程</a></li>
+  <li><a href="#http请求响应格式">HTTP请求响应格式</a></li>
+  <li><a href="#http请求头信息">HTTP请求头信息</a></li>
+  <li><a href="#http响应头信息">HTTP响应头信息</a></li>
 </ul>
 
   
 
   <section class="post">
-    <h3 id="介绍">介绍</h3>
+    <h3 id="背景">背景</h3>
 
-<p>　　同生活中的许多伟大事物一样，Git 诞生于一个极富纷争大举创新的年代。</p>
+<p>　 在WEB应用程序开发中，HTTP应该算的上是最常用的网络协议之一了吧。在平时的工作也只是简单的使用HTTP的相关知识，但是最近在编写PYTHON爬虫脚本的时候，发现熟悉网络协议是编写爬虫脚本的基础。</p>
 
-<p>　　Git的作者Linus，同样是Linux 的缔造者，为了高度推举开源的大旗和更好的开发和管理Linux，开发出了Git这个优秀的版本版本控制系统</p>
+<h3 id="url和uri">URL和URI</h3>
 
-<p>　　作为一位开发者，熟悉掌握Git是一项非常实用的技能，合理高效的管理代码，不仅可以为我们节约时间，还能提高编码的效率。现在基于Git的版本控制软件有很多，比如：Sourcetree、TortoiseGit等工具，但是本人还是推荐使用命令行操作，因为只有熟练的使用命令行，才能更好的理解底层原理。</p>
+<ul>
+  <li>URI (Uniform Resource Identifier)即统一资源标记符</li>
+  <li>URL (Universal Resource Locator)即统一资源定位符</li>
+  <li>URN (Universal Resource Name)只命名资源而不指定如何定位资源</li>
+</ul>
 
-<h3 id="安装git">安装Git</h3>
-<p>参考<a href="https://git-scm.com/book/zh/v2/%E8%B5%B7%E6%AD%A5-%E5%AE%89%E8%A3%85-Git">官方安装教程</a></p>
+<p>URL是URI的子集
+每一个URL都是URI，但不是每个URI都是URL
+URI还包括一类叫做URI即统一资源名称</p>
 
-<h3 id="配置git">配置Git</h3>
+<p>URI = URI ∩ URN</p>
 
-<p>安装完成后，还需要最后一步设置，在命令行输入：</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git config --global user.name "User Name"
-git config --global user.email "email@example.com"
-</code></pre></div></div>
-<p>–global：使用该参数时，Git会修改 ~/.gitconfig 或 ~/.config/git/config 文件里面的用户名和邮箱地址。该配置会默认作用于所有Git管理的仓库，如果需要更改某个仓库下的用户名和邮箱信息，可以使用 git config 命令，不携带 –global 选项，也可以手动修改 .git/config 文件里面用户和邮箱信息。</p>
+<h3 id="超文本">超文本</h3>
 
-<h3 id="常用命令">常用命令：</h3>
+<p>浏览器里看到的网页就是由超文本解析而成的，其网页源码是一系列HTML代码，里面包含了一些列标签</p>
 
-<blockquote>
-  <ul>
-    <li>git init（创建Git版本库）</li>
-    <li>git add .（全部添加到暂存区）</li>
-    <li>git commit -m ‘commit message’（提交暂存区的记录到本地仓库）</li>
-    <li>git config (配置和获取Git环境参数)</li>
-    <li>git status (查看版本库状态)</li>
-    <li>git fetch (拉取远程仓库引用到本地版本库)</li>
-    <li>git pull (拉取远程仓库引用到本地工作区)</li>
-    <li>git push (推送本地引用)</li>
-    <li>git checkout (检出操作)</li>
-    <li>git reflog (查看分支的操作记录)</li>
-    <li>git stash (暂存本地修改)</li>
-  </ul>
-</blockquote>
+<p><img src="/images/posts/HTTP/elements.png" /></p>
 
-<h3 id="常见问题">常见问题：</h3>
+<h3 id="http和https">HTTP和HTTPS</h3>
 
-<h4 id="配置了gitignore的忽略项但是不起作用">配置了.gitignore的忽略项但是不起作用</h4>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 清理本地库的缓存，并且重新添加版本库。
-git rm -r --cached .
-git add .
-git commit -m "update .gitignore"
-</code></pre></div></div>
+<p>HTTP:(Hyper Text Transfer Protocol)中文名叫作超文本传输协议
+用于从网络传输超文本数据到本地浏览器的传送协议，能保证高效而准确地传送超文本文档
+由万维网协会（World Wide Web Consortium)和 Internet 工作小组 IETF (Internet Engineering TaskForce)共同合作制定的规范
+目前广泛使用的是HTTP 1.1版本</p>
 
-<h4 id="冲突处理流程">冲突处理流程：</h4>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. 本地进行了一次提交操作，这个时候我们准备推送到远程仓库，当执行推送操作时GIT提示报错，要我们先执行拉取操作。
-````
-➜  GitTest git:(master) git push
-To https://github.com/liuqiang-code/GitTest.git
- ! [rejected]        master -&gt; master (non-fast-forward)
-error: failed to push some refs to 'https://github.com/liuqiang-code/GitTest.git'
-hint: Updates were rejected because the tip of your current branch is behind
-hint: its remote counterpart. Integrate the remote changes (e.g.
-hint: 'git pull ...') before pushing again.
-hint: See the 'Note about fast-forwards' in 'git push --help' for details.
-➜  GitTest git:(master)
-````
-2. 根据Git提示执行git pull操作
-````
-➜  GitTest git:(master) git pull
-Auto-merging hello.txt
-CONFLICT (content): Merge conflict in hello.txt
-Automatic merge failed; fix conflicts and then commit the result.
-➜  GitTest git:(master) ✗ 
-````
-3. GIT提示：尝试自动合并hello.txt文件失败，提示要我们手动解决冲突然后再次提交。
-4. 根据提示，首先查看冲突文件 hello.txt，GIT使用 &lt;&lt;&lt;&lt;&lt;&lt;&lt; ======= &gt;&gt;&gt;&gt;&gt;&gt;&gt; 标记冲突行。&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD 和 ======= 之间的是本地记录，而 ======= 和 &gt;&gt;&gt;&gt;&gt;&gt;&gt; c53ee6465cc033d1eb38c333612bc98e444afe1f 之间的是远程记录。
-````
-➜  GitTest git:(master) ✗ cat hello.txt
-hello git
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
-hello weiwei
-=======
-BigStrong is Handsome
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; c53ee6465cc033d1eb38c333612bc98e444afe1f
-➜  GitTest git:(master) ✗
-````
-5. 然后我们再根据实际要求手动处理冲突，当我们手动处理完冲突后使用git status 查看版本库状态时会提示我们再次执行add和commit操作，执行完commit操作后提示fix conflicts，GIT默认（是否解决只有自己知道）我们解决了冲突，因为我们执行了commit操作，最后查看状态提示执行推送操作。
-````
-➜  GitTest git:(master) ✗ cat hello.txt
-hello git
-hello weiwei and BigStrong is Handsome
-➜  GitTest git:(master) ✗ git status
-On branch master
-Your branch and 'origin/master' have diverged,
-and have 1 and 1 different commits each, respectively.
-  (use "git pull" to merge the remote branch into yours)
-You have unmerged paths.
-  (fix conflicts and run "git commit")
-  (use "git merge --abort" to abort the merge)
-Unmerged paths:
-  (use "git add &lt;file&gt;..." to mark resolution)
-	both modified:   hello.txt
-no changes added to commit (use "git add" and/or "git commit -a")
-➜  GitTest git:(master) ✗ git add hello.txt
-➜  GitTest git:(master) ✗ git commit -m "fix conflicts"
-[master 6d705a0] fix conflicts
-➜  GitTest git:(master) git status
-On branch master
-Your branch is ahead of 'origin/master' by 2 commits.
-  (use "git push" to publish your local commits)
-nothing to commit, working tree clean
-➜  GitTest git:(master) git push
-Counting objects: 6, done.
-Delta compression using up to 4 threads.
-Compressing objects: 100% (2/2), done.
-Writing objects: 100% (6/6), 551 bytes | 551.00 KiB/s, done.
-Total 6 (delta 0), reused 0 (delta 0)
-To https://github.com/liuqiang-code/GitTest.git
-   	c53ee64..6d705a0  master -&gt; master
-````
-6. 总结：养成使用 git status 命令习惯。学会看提示信息，GIT 的提示信息非常友善，利用提示信息可以很大的提高工作效率。
+<p>HTTPS (Hyper Text Transfer Protocol over Secure Socket Layer)
+是以安全为目标的HTTP通道，简单讲是HTTP的安全版，即HTTP下加入SSL层，简称为HTTPS 安全基础是SSL，因此通过它传输的内容都是经过SSL加密 主要作用可以分为两种：</p>
+<ul>
+  <li>建立一个信息安全通道，来保证数据传输的安全</li>
+  <li>确认网站的真实性，凡是使用了HTTPS的网站，都可以通过点击浏览器地址栏的锁头标志来查看网站认证之后的真实信息，也可以通过CA机构颁发的安全签章来查询</li>
+</ul>
+
+<h3 id="http请求过程">HTTP请求过程</h3>
+
+<p>在浏览器中输入一个URL,回车之后便可以在浏览器中观察到页面内容 这个过程是浏览器向网站所在的服务器发送了一个请求 网站服务器接收到这个请求后进行处理和解析，然后返回对应的响应，接着传回给浏览器</p>
+
+<p><img src="/images/posts/HTTP/http请求过程.png" /></p>
+
+<h3 id="http请求响应格式">HTTP请求响应格式</h3>
+<p>HTTP请求格式</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;request-line&gt;
+&lt;headers&gt;
+&lt;blank line&gt;
+[&lt;request-body&gt;]
+说明:第一行必须是一个请求行(request-line),用来说明请求类型,要访问的资源以及所使用的HTTP版本.
+      紧接着是一个首部(header)小节,用来说明服务器要使用的附加信息.
+      之后是一个空行.
+      再后面可以添加任意的其他数据[称之为主体(body)].
 </code></pre></div></div>
 
-<h4 id="远程分支有提交本地修改未提交可以直接git-pull吗">远程分支有提交，本地修改未提交可以直接git pull吗？</h4>
-<p>1、首先通过 git status 查看本地状态</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>➜  GitTest git:(master) git status
-On branch master
-Your branch is behind 'origin/master' by 2 commits, and can be fast-forwarded.
-  (use "git pull" to update your local branch)
+<ul>
+  <li>GET请求格式</li>
+</ul>
 
-nothing to commit, working tree clean
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GET / HTTP/1.1
+Accept: */*
+Accept-Language: zh-cn
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022)
+Host: www.google.cn
+Connection: Keep-Alive
+说明:请求的第一部分说明了该请求是一个GET请求.该行的第二部分是一个斜杠(/),用来说明请求的是该域名的根目录.该行的最后一部分说明使用的是HTTP1.1版本(另一个可选荐是1.0).
+      第2行是请求的第一个首部,HOST将指出请求的目的地.User-Agent,服务器端和客户端脚本都能访问它,它是浏览器类型检测逻辑的重要基础.该信息由你的浏览器来定义,并且在每个请求中自动发送.Connection,通常将浏览器操作设置为Keep-Alive
+      第三部分,空行,即使不存在请求主体,这个空行也是必需的.
 </code></pre></div></div>
-<p>2、修改文件并且查看状态</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>➜  GitTest git:(master) ll
-total 8
--rw-r--r--  1 apple  staff    23B  8 23 10:32 hello.txt
-➜  GitTest git:(master) echo 'modify file' &gt;&gt; hello.txt
-➜  GitTest git:(master) ✗
-➜  GitTest git:(master) ✗
-➜  GitTest git:(master) ✗ git status
-On branch master
-Your branch is behind 'origin/master' by 2 commits, and can be fast-forwarded.
-  (use "git pull" to update your local branch)
 
-Changes not staged for commit:
-  (use "git add &lt;file&gt;..." to update what will be committed)
-  (use "git checkout -- &lt;file&gt;..." to discard changes in working directory)
+<ul>
+  <li>POST请求格式</li>
+</ul>
 
-	modified:   hello.txt
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>POST / HTTP1.1
+Host:www.wrox.com
+User-Agent:Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022)
+Content-Type:application/x-www-form-urlencoded
+Content-Length:40
+Connection: Keep-Alive
 
-no changes added to commit (use "git add" and/or "git commit -a")
+name=Professional%20Ajax&amp;publisher=Wiley
+说明:请求行开始处的GET改为POST,以表示不同的请求类型.
+      Content-Type说明了请求主体的内容是如何编码的.浏览器始终以application/x-www-form-urlencoded的格式编码来传送数据,这是针对简单URL编码的MIME类型.Content-Length说明了请求主体的字节数.
+      最后请求主体.名称-值对的形式.
 </code></pre></div></div>
-<p>3、不提交修改，直接使用git pull拉取提交</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>➜  GitTest git:(master) ✗ git status
-On branch master
-Your branch is behind 'origin/master' by 2 commits, and can be fast-forwarded.
-  (use "git pull" to update your local branch)
 
-Changes not staged for commit:
-  (use "git add &lt;file&gt;..." to update what will be committed)
-  (use "git checkout -- &lt;file&gt;..." to discard changes in working directory)
+<ul>
+  <li>响应格式</li>
+</ul>
 
-	modified:   hello.txt
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;status-line&gt;</span>
+<span class="nt">&lt;headers&gt;</span>
+<span class="nt">&lt;blank</span> <span class="na">line</span><span class="nt">&gt;</span>
+[<span class="nt">&lt;response-body&gt;</span>]
 
-no changes added to commit (use "git add" and/or "git commit -a")
-➜  GitTest git:(master) ✗ git pull
-Updating 5be3084..6d705a0
-error: Your local changes to the following files would be overwritten by merge:
-	hello.txt
-Please commit your changes or stash them before you merge.
-Aborting
-➜  GitTest git:(master) ✗
+例子：
+HTTP/1.1 200 OK
+Date: Fri, 22 May 2009 06:07:21 GMT
+Content-Type: text/html; charset=UTF-8
+
+<span class="nt">&lt;html&gt;</span>
+      <span class="nt">&lt;head&gt;&lt;/head&gt;</span>
+      <span class="nt">&lt;body&gt;</span>
+            <span class="c">&lt;!--body goes here--&gt;</span>
+      <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+说明:HTTP状态码200,找到资源,并且一切正常.
+      Date:生成响应的日期和时间.
+      Content-Type:指定了MIME类型的HTML(text/html),编码类型是UTF-8
+      HTML源文体.
 </code></pre></div></div>
-<p>4、总结：git会提示操作用户本地修改未提交直接git pull时本地修改会被覆盖，请先commit或者stash修改。</p>
+
+<h3 id="http请求头信息">HTTP请求头信息</h3>
+
+<ul>
+  <li>
+    <p>Cookie: 也常用复数形式Cookies,这是网站为了辨别用户进行会话跟踪而存储在用户本地的数据它的主要功能是维持当前访问会话。</p>
+  </li>
+  <li>
+    <p>Referer: 此内容用来标识这个请求是从哪个页面发过来的，服务器可以拿到这一信息并做相应的处理 如做来源统计、防盗链处理等</p>
+  </li>
+  <li>
+    <p>User-Agent: 简称UA，它是一个特殊的字符串头，可以使服务器识别客户使用的操作系统及版本、浏览器及版本等信息。在做爬虫时加上此信息，可以伪装为浏览器；如果不加，很可能会被识别出为爬虫</p>
+  </li>
+  <li>
+    <p>Content-Type:也叫互联网媒体类型（Internet Media Type)或者MIME类型，在HTTP协议消息头 中，它用来表示具体请求中的媒体类型信息。例如，text/html代表HTML格式，image/gif代表GIF 图片，application/json代表JSON类型</p>
+  </li>
+</ul>
+
+<h3 id="http响应头信息">HTTP响应头信息</h3>
+
+<ul>
+  <li>
+    <p>Date: 标识响应产生的时间</p>
+  </li>
+  <li>
+    <p>Last-Modified: 指定资源的最后修改时间</p>
+  </li>
+  <li>
+    <p>Content-Encoding: 指定响应内容的编码</p>
+  </li>
+  <li>
+    <p>Server: 包含服务器的信息，比如名称、版本号等</p>
+  </li>
+  <li>
+    <p>Content-Type: 文档类型，指定返回的数据类型是什么，如text/html代表返回HTML文档 application/x-javascript 则代表返回 JavaScript 文件，image/jpeg 则代表返回图片</p>
+  </li>
+  <li>
+    <p>Set-Cookie: 设置Cookies。响应头中的Set-Cookie告诉浏览器需要将此内容放在Cookies中 下次请求携带Cookies请求</p>
+  </li>
+  <li>
+    <p>Expires: 指定响应的过期时间，可以使代理服务器或浏览器将加载的内容更新到缓存中，如果再次访问时，就可以直接从缓存中获取，降低服务器负载，缩短响应时间</p>
+  </li>
+</ul>
 
 <p><br />
-转载请注明：<a href="https://liuqiang-code.github.io/">刘强的博客</a> » <a href="https://liuqiang-code.github.io/2020/07/GitCourse/">点击阅读原文</a></p>
+转载请注明：<a href="https://liuqiang-code.github.io/">刘强的博客</a> » <a href="https://liuqiang-code.github.io/2020/08/HTTP/">点击阅读原文</a></p>
 
   </section>
 
@@ -427,11 +415,11 @@ Aborting
 
        <ul class="pager">
         
-        
-        <li class="next">
-            <a href="/2020/07/Tomcat2SpringBootBug/" data-toggle="tooltip" data-placement="top" title="SpringBoot默认存储路径带来的BUG">下一篇：  <span>SpringBoot默认存储路径带来的BUG</span>
+        <li class="previous">
+            <a href="/2020/07/Tomcat2SpringBootBug/" data-toggle="tooltip" data-placement="top" title="SpringBoot默认存储路径带来的BUG">上一篇：  <span>SpringBoot默认存储路径带来的BUG</span>
             </a>
         </li>
+        
         
     </ul>
 </section>
@@ -443,8 +431,8 @@ Aborting
     <script>
     
     var disqus_config = function () {
-        this.page.url = "http://localhost:4000/2020/07/GitCourse/";
-        this.page.identifier = "/2020/07/GitCourse/";
+        this.page.url = "http://localhost:4000/2020/08/HTTP/";
+        this.page.identifier = "/2020/08/HTTP/";
     };
     var disqus_shortname = 'leopard';
     

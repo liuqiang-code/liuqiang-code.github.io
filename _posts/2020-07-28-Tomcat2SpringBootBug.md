@@ -29,7 +29,7 @@ tags: Java
 
 ### 总结
 - 根据系统运行日志排除问题
-- 当使用一项新技术时需要对该技术有一定的掌控度，切记盲目使用。
+- 当使用一项新技术时需要对该技术有全面的了解，切记盲目使用。
 
 <br>
 转载请注明：[刘强的博客](https://liuqiang-code.github.io/) » [点击阅读原文](https://liuqiang-code.github.io/2020/07/Tomcat2SpringBootBug/)
