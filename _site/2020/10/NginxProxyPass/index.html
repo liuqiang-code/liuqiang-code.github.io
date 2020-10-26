@@ -6,17 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>web服务之网络堵塞</title>
-  <meta name="description" content="场景">
+  <title>Nginx之proxy_pass指令</title>
+  <meta name="description" content="结论　 在nginx中配置proxy_pass代理转发时如果在proxy_pass后面的url加/，表示绝对根路径；如果没有/，表示相对路径，把匹配的路径部分也给代理走。">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="web服务之网络堵塞">
-  <meta name="twitter:description" content="场景">
+  <meta name="twitter:title" content="Nginx之proxy_pass指令">
+  <meta name="twitter:description" content="结论　 在nginx中配置proxy_pass代理转发时如果在proxy_pass后面的url加/，表示绝对根路径；如果没有/，表示相对路径，把匹配的路径部分也给代理走。">
   
   <meta property="og:type" content="article">
-  <meta property="og:title" content="web服务之网络堵塞">
-  <meta property="og:description" content="场景">
+  <meta property="og:title" content="Nginx之proxy_pass指令">
+  <meta property="og:description" content="结论　 在nginx中配置proxy_pass代理转发时如果在proxy_pass后面的url加/，表示绝对根路径；如果没有/，表示相对路径，把匹配的路径部分也给代理走。">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link rel="canonical" href="http://localhost:4000/2020/10/NetWorkBlock/">
+  <link rel="canonical" href="http://localhost:4000/2020/10/NginxProxyPass/">
   <link rel="alternate" type="application/rss+xml" title="刘强" href="http://localhost:4000/feed.xml">
   
   <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
@@ -160,10 +160,10 @@
 
 <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
-    <h1 class="post-title">web服务之网络堵塞</h1>
+    <h1 class="post-title">Nginx之proxy_pass指令</h1>
     <div class="post-meta">
       <img src="/images/calendar.png" width="20px"/> 
-      <time datetime="2020-10-11 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2020-10-11</time>  
+      <time datetime="2020-10-26 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2020-10-26</time>  
 
       <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
     </p>
@@ -173,42 +173,83 @@
   
     <h2 class="post-title">目录</h2>
     <ul>
-  <li><a href="#场景">场景</a></li>
-  <li><a href="#处理过程">处理过程</a>
+  <li><a href="#结论">结论</a></li>
+  <li><a href="#验证过程">验证过程</a>
     <ul>
-      <li><a href="#排查服务自身问题">排查服务自身问题</a></li>
-      <li><a href="#排查网络问题">排查网络问题</a></li>
+      <li><a href="#步骤一启动被代理服务">步骤一：启动被代理服务</a></li>
+      <li><a href="#步骤二配置nginx">步骤二：配置nginx</a></li>
+      <li><a href="#步骤三测试验证">步骤三：测试验证</a></li>
     </ul>
   </li>
-  <li><a href="#总结">总结</a></li>
 </ul>
 
   
 
   <section class="post">
-    <h3 id="场景">场景</h3>
+    <h3 id="结论">结论</h3>
+<p>　 在nginx中配置proxy_pass代理转发时如果在proxy_pass后面的url加/，表示绝对根路径；如果没有/，表示相对路径，把匹配的路径部分也给代理走。</p>
 
-<p>　 客户反馈现场的服务有时点击没有反应，页面时常抱错。打开浏览器开发者工具发现存在很多请求超时请求。</p>
+<h3 id="验证过程">验证过程</h3>
+<h4 id="步骤一启动被代理服务">步骤一：启动被代理服务</h4>
+<ul>
+  <li>
+    <p>使用python3提供的 http.server 模块创建一个http服务，并且在该服务下面存放一些资源，以供被请求调用。
+<img src="/images/posts/NginxProxyPass/httpServer.png" /></p>
+  </li>
+  <li>
+    <p>通过界面访问验证服务是否正常启动
+<img src="/images/posts/NginxProxyPass/checkHttpServer.png" /></p>
+  </li>
+</ul>
 
-<p><img src="/images/posts/NetWorkBlock/serviceF12.png" /></p>
+<h4 id="步骤二配置nginx">步骤二：配置nginx</h4>
+<ul>
+  <li>
+    <p>配置location和upstream模块
+<img src="/images/posts/NginxProxyPass/nginxConfig.png" /></p>
+  </li>
+  <li>
+    <p>验证nginx是否正常启动
+<img src="/images/posts/NginxProxyPass/checkNginx.png" /></p>
+  </li>
+</ul>
 
-<h3 id="处理过程">处理过程</h3>
-<h4 id="排查服务自身问题">排查服务自身问题</h4>
-<p>　 遇到问题首先检查服务运行日志，看是否能根据抱错日志跟踪到原因，查看服务运行日志发现报了一个断开渠道的错误，查询相关资料后得知该错误是tomcat服务处理一个已经关闭的请求时报出的异常。由于服务是通过Nginx代理出来的服务，所以进一步排除Nginx是否存在相关抱错，排查发现不存在相关抱错，所以进一步排除网络是否存在问题。</p>
+<h4 id="步骤三测试验证">步骤三：测试验证</h4>
+<ul>
+  <li>验证相对路径访问</li>
+</ul>
 
-<p><img src="/images/posts/NetWorkBlock/serviceRunningLog.png" /></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 访问相对路径 test/a.txt  实际转发路径: http://127.0.0.1:20001/test/a.txt
+&gt;&gt;&gt; import requests
+&gt;&gt;&gt; URL = r'http://127.0.0.1:20001/'
+&gt;&gt;&gt; ret = requests.get(URL + 'test/a.txt')
+&gt;&gt;&gt; ret.text
+'a file\n'
+&gt;&gt;&gt;
+</code></pre></div></div>
 
-<h4 id="排查网络问题">排查网络问题</h4>
-<p>　 使用telnet命令发现网络不稳定的情况
-   <img src="/images/posts/NetWorkBlock/telnet.png" />
-　 使用ping命令发现网络存在丢包的情况<br />
-   <img src="/images/posts/NetWorkBlock/ping.png" /></p>
+<ul>
+  <li>验证绝对路径访问</li>
+</ul>
 
-<h3 id="总结">总结</h3>
-<p>　 web服务出现异常时，有时需要从网络上排查问题，网络是一切服务的必要条件。我们可以通过ping、telnet等命令检查网络的基础状况，如果需要更加深度的排查网络问题的话，我们可以借助Wireshark抓包进行分析。</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 访问绝对路径 test2/test/a.txt 实际转发路径 http://127.0.0.1:20001/test/a.txt
+&gt;&gt;&gt; import requests
+&gt;&gt;&gt; URL = r'http://127.0.0.1:20001/'
+&gt;&gt;&gt; ret = requests.get(URL + 'test2/test/a.txt')
+&gt;&gt;&gt; ret.text
+'a file\n'
+&gt;&gt;&gt;
+
+&gt;&gt;&gt; import requests
+&gt;&gt;&gt; URL = r'http://127.0.0.1:20001/'
+&gt;&gt;&gt; ret = requests.get(URL + 'test3')
+&gt;&gt;&gt; ret.text
+'d file\n'
+&gt;&gt;&gt;
+</code></pre></div></div>
 
 <p><br />
-转载请注明：<a href="https://liuqiang-code.github.io/">刘强的博客</a> » <a href="https://liuqiang-code.github.io/2020/10/NetWorkBlock/">点击阅读原文</a></p>
+转载请注明：<a href="https://liuqiang-code.github.io/">刘强的博客</a> » <a href="https://liuqiang-code.github.io/2020/10/NginxProxyPass/">点击阅读原文</a></p>
 
   </section>
 
@@ -278,15 +319,10 @@
        <ul class="pager">
         
         <li class="previous">
-            <a href="/2020/08/HTTP/" data-toggle="tooltip" data-placement="top" title="有关爬虫的HTTP网络基础">上一篇：  <span>有关爬虫的HTTP网络基础</span>
+            <a href="/2020/10/NetWorkBlock/" data-toggle="tooltip" data-placement="top" title="web服务之网络堵塞">上一篇：  <span>web服务之网络堵塞</span>
             </a>
         </li>
         
-        
-        <li class="next">
-            <a href="/2020/10/NginxProxyPass/" data-toggle="tooltip" data-placement="top" title="Nginx之proxy_pass指令">下一篇：  <span>Nginx之proxy_pass指令</span>
-            </a>
-        </li>
         
     </ul>
 </section>
@@ -298,8 +334,8 @@
     <script>
     
     var disqus_config = function () {
-        this.page.url = "http://localhost:4000/2020/10/NetWorkBlock/";
-        this.page.identifier = "/2020/10/NetWorkBlock/";
+        this.page.url = "http://localhost:4000/2020/10/NginxProxyPass/";
+        this.page.identifier = "/2020/10/NginxProxyPass/";
     };
     var disqus_shortname = 'leopard';
     

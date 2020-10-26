@@ -159,6 +159,27 @@
   <ol class="post-list">
     
     <li>
+      <h2 class="post-list__post-title post-title"><a href="/2020/10/NginxProxyPass/" title="访问 Nginx之proxy_pass指令">Nginx之proxy_pass指令</a></h2>
+      <p class="excerpt">结论　 在nginx中配置proxy_pass代理转发时如果在proxy_pass后面的url加/，表示绝对根路径；如果没有/，表示相对路径，把匹配的路径部分也给代理走。验证过程步骤一：启动被代理服务      使用python3提供的 http.server 模块创建一个http服务，并且在该服务下面存放一些资源，以供被请求调用。        通过界面访问验证服务是否正常启动  步骤二：配置nginx      配置location和upstream模块        验证nginx是...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2020-10-26 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2020-10-26</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">Nginx</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2020/10/NginxProxyPass/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
       <h2 class="post-list__post-title post-title"><a href="/2020/10/NetWorkBlock/" title="访问 web服务之网络堵塞">web服务之网络堵塞</a></h2>
       <p class="excerpt">场景　 客户反馈现场的服务有时点击没有反应，页面时常抱错。打开浏览器开发者工具发现存在很多请求超时请求。处理过程排查服务自身问题　 遇到问题首先检查服务运行日志，看是否能根据抱错日志跟踪到原因，查看服务运行日志发现报了一个断开渠道的错误，查询相关资料后得知该错误是tomcat服务处理一个已经关闭的请求时报出的异常。由于服务是通过Nginx代理出来的服务，所以进一步排除Nginx是否存在相关抱错，排查发现不存在相关抱错，所以进一步排除网络是否存在问题。排查网络问题　 使用telnet命令发现...&hellip;</p>
       <div class="post-list__meta">        

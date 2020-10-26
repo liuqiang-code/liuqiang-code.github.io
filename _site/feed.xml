@@ -5,9 +5,85 @@
     <description>欢迎来到我的个人博客~</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 12 Oct 2020 00:18:46 +0800</pubDate>
-    <lastBuildDate>Mon, 12 Oct 2020 00:18:46 +0800</lastBuildDate>
+    <pubDate>Mon, 26 Oct 2020 20:38:12 +0800</pubDate>
+    <lastBuildDate>Mon, 26 Oct 2020 20:38:12 +0800</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
+    
+      <item>
+        <title>Nginx之proxy_pass指令</title>
+        <description>&lt;h3 id=&quot;结论&quot;&gt;结论&lt;/h3&gt;
+&lt;p&gt;　 在nginx中配置proxy_pass代理转发时如果在proxy_pass后面的url加/，表示绝对根路径；如果没有/，表示相对路径，把匹配的路径部分也给代理走。&lt;/p&gt;
+
+&lt;h3 id=&quot;验证过程&quot;&gt;验证过程&lt;/h3&gt;
+&lt;h4 id=&quot;步骤一启动被代理服务&quot;&gt;步骤一：启动被代理服务&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;使用python3提供的 http.server 模块创建一个http服务，并且在该服务下面存放一些资源，以供被请求调用。
+&lt;img src=&quot;/images/posts/NginxProxyPass/httpServer.png&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;通过界面访问验证服务是否正常启动
+&lt;img src=&quot;/images/posts/NginxProxyPass/checkHttpServer.png&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;步骤二配置nginx&quot;&gt;步骤二：配置nginx&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;配置location和upstream模块
+&lt;img src=&quot;/images/posts/NginxProxyPass/nginxConfig.png&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;验证nginx是否正常启动
+&lt;img src=&quot;/images/posts/NginxProxyPass/checkNginx.png&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;步骤三测试验证&quot;&gt;步骤三：测试验证&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;验证相对路径访问&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# 访问相对路径 test/a.txt  实际转发路径: http://127.0.0.1:20001/test/a.txt
+&amp;gt;&amp;gt;&amp;gt; import requests
+&amp;gt;&amp;gt;&amp;gt; URL = r'http://127.0.0.1:20001/'
+&amp;gt;&amp;gt;&amp;gt; ret = requests.get(URL + 'test/a.txt')
+&amp;gt;&amp;gt;&amp;gt; ret.text
+'a file\n'
+&amp;gt;&amp;gt;&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;验证绝对路径访问&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# 访问绝对路径 test2/test/a.txt 实际转发路径 http://127.0.0.1:20001/test/a.txt
+&amp;gt;&amp;gt;&amp;gt; import requests
+&amp;gt;&amp;gt;&amp;gt; URL = r'http://127.0.0.1:20001/'
+&amp;gt;&amp;gt;&amp;gt; ret = requests.get(URL + 'test2/test/a.txt')
+&amp;gt;&amp;gt;&amp;gt; ret.text
+'a file\n'
+&amp;gt;&amp;gt;&amp;gt;
+
+&amp;gt;&amp;gt;&amp;gt; import requests
+&amp;gt;&amp;gt;&amp;gt; URL = r'http://127.0.0.1:20001/'
+&amp;gt;&amp;gt;&amp;gt; ret = requests.get(URL + 'test3')
+&amp;gt;&amp;gt;&amp;gt; ret.text
+'d file\n'
+&amp;gt;&amp;gt;&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;br /&gt;
+转载请注明：&lt;a href=&quot;https://liuqiang-code.github.io/&quot;&gt;刘强的博客&lt;/a&gt; » &lt;a href=&quot;https://liuqiang-code.github.io/2020/10/NginxProxyPass/&quot;&gt;点击阅读原文&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Mon, 26 Oct 2020 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2020/10/NginxProxyPass/</link>
+        <guid isPermaLink="true">http://localhost:4000/2020/10/NginxProxyPass/</guid>
+        
+        <category>Nginx</category>
+        
+        
+      </item>
     
       <item>
         <title>web服务之网络堵塞</title>
