@@ -5,9 +5,255 @@
     <description>欢迎来到我的个人博客~</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 26 Oct 2020 20:38:12 +0800</pubDate>
-    <lastBuildDate>Mon, 26 Oct 2020 20:38:12 +0800</lastBuildDate>
+    <pubDate>Mon, 02 Nov 2020 16:40:41 +0800</pubDate>
+    <lastBuildDate>Mon, 02 Nov 2020 16:40:41 +0800</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
+    
+      <item>
+        <title>rpmbuild制作rpm包总结</title>
+        <description>&lt;h3 id=&quot;linux-软件安装方式&quot;&gt;linux 软件安装方式&lt;/h3&gt;
+&lt;h4 id=&quot;源码包安装&quot;&gt;源码包安装&lt;/h4&gt;
+&lt;h5 id=&quot;优点&quot;&gt;优点&lt;/h5&gt;
+&lt;ol&gt;
+  &lt;li&gt;开源，如果有足够的能力，可以修改源代码；&lt;/li&gt;
+  &lt;li&gt;可以自由选择所需的功能；&lt;/li&gt;
+  &lt;li&gt;软件是编译安装，所以更加适合自己的系统，更加稳定、效率更高；&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h5 id=&quot;缺点&quot;&gt;缺点&lt;/h5&gt;
+&lt;ol&gt;
+  &lt;li&gt;安装过程步骤较多，尤其安装较大的软件集合时（如LAMP环境搭建），容易出现拼写错误；&lt;/li&gt;
+  &lt;li&gt;编译过程时间较长，安装比二进制安装时间长；&lt;/li&gt;
+  &lt;li&gt;因为是编译安装，安装过程中一旦报错新手很难解决；&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&quot;二进制安装rpm&quot;&gt;二进制安装(RPM)&lt;/h4&gt;
+&lt;h5 id=&quot;优点-1&quot;&gt;优点&lt;/h5&gt;
+&lt;ol&gt;
+  &lt;li&gt;包管理系统简单，只通过几个命令就可以实现包的安装、升级、查询和卸载；&lt;/li&gt;
+  &lt;li&gt;安装速度比源码包安装快的多；&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h5 id=&quot;缺点-1&quot;&gt;缺点&lt;/h5&gt;
+&lt;ol&gt;
+  &lt;li&gt;经过编译，不再可以看到源代码；&lt;/li&gt;
+  &lt;li&gt;功能选择不如源码包灵活；&lt;/li&gt;
+  &lt;li&gt;依赖性；&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;安装rpmbuild工具&quot;&gt;安装rpmbuild工具&lt;/h3&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;yum install rpm* rpm-build rpmdev*
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;rpmbuid打包目录&quot;&gt;rpmbuid打包目录&lt;/h3&gt;
+
+&lt;p&gt;rpm打包目录有一些严格的层次上的要求。&lt;/p&gt;
+
+&lt;p&gt;pm的版本&amp;lt;=4.4.x，rpmbuid工具其默认的工作路径是 /usr/src/redhat因为权限的问题，普通用户不能制作rpm包，制作rpm软件包时必须切换到 root 身份才可以。&lt;/p&gt;
+
+&lt;p&gt;rpm从4.5.x版本开始，将rpmbuid的默认工作路径移动到用户家目录下的rpmbuild目录里，即 $HOME/rpmbuild ，并且推荐用户在制作rpm软件包时尽量不要以root身份进行操作。&lt;/p&gt;
+
+&lt;p&gt;rpmbuild默认工作路径的确定，通常由在 /usr/lib/rpm/macros  这个文件里的一个叫做 %_topdir 的宏变量来定义。如果用户想更改这个目录名，rpm官方并不推荐直接更改这个目录，而是在用户家目录下建立一个名为 .rpmmacros 的隐藏文件(Linux下隐藏文件,前面的点不能少)，然后在里面重新定义 %_topdir，指向一个新的目录名。这样就可以满足某些用户的差异化需求了。通常情况下.rpmmacros文件里一般只有一行内容，比如：&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;%_topdir    $HOME/myrpmbuildenv 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;在%_topdir目录下一般需要建立6个目录&lt;br /&gt;
+可以使用 rpmdev-setuptree命令在当前用户home/rpmbuild目录里自动建立上述目录。&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;目录名&lt;/th&gt;
+      &lt;th&gt;说明&lt;/th&gt;
+      &lt;th&gt;macros中的宏名&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;BUILD&lt;/td&gt;
+      &lt;td&gt;编译rpm包的临时目录&lt;/td&gt;
+      &lt;td&gt;%_builddir&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;BUILDROOT&lt;/td&gt;
+      &lt;td&gt;编译后生成的软件临时安装目录&lt;/td&gt;
+      &lt;td&gt;%_buildrootdir&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;RPMS&lt;/td&gt;
+      &lt;td&gt;最终生成的可安装rpm包的所在目录&lt;/td&gt;
+      &lt;td&gt;%_rpmdir&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;SOURCES&lt;/td&gt;
+      &lt;td&gt;所有源代码和补丁文件的存放目录&lt;/td&gt;
+      &lt;td&gt;%_sourcedir&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;SPECS&lt;/td&gt;
+      &lt;td&gt;存放SPEC文件的目录&lt;/td&gt;
+      &lt;td&gt;%_specdir&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;SRPMS&lt;/td&gt;
+      &lt;td&gt;软件最终的rpm源码格式存放路径&lt;/td&gt;
+      &lt;td&gt;%_srcrpmdir&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h4 id=&quot;rpmbuid-宏变量配置文件&quot;&gt;rpmbuid 宏变量配置文件&lt;/h4&gt;
+
+&lt;h5 id=&quot;路径&quot;&gt;路径&lt;/h5&gt;
+&lt;p&gt;/usr/lib/rpm/macros&lt;/p&gt;
+&lt;h5 id=&quot;查看宏变量值&quot;&gt;查看宏变量值&lt;/h5&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;rpm -E &quot;%{macro}&quot;
+
+注意： %{macro} 是shell中获取变量的标识，也可以用%macro 获取 
+变量名外面的花括号是可选的，加不加都行，加花括号是为了帮助解释器识别变量的边界
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;%{?dist} 表示什么含义？&lt;/p&gt;
+
+&lt;p&gt;不加问号，如果 dist 有定义，那么就会用定义的值替换，否则就会保 %{dist};
+加问好，如果 dist 有定义，那么也是会用定义的值替换，否则就直接移除这个tag %{?dist}&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ rpm -E 'foo:%{foo}'$'\n''bar:%{?bar}'
+foo:%{foo}
+bar:
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;spec文件&quot;&gt;spec文件&lt;/h3&gt;
+&lt;p&gt;制作 rpm 软件包并不是一件复杂的工作，其中的关键在于编写软件包的 spec 描述文件。&lt;/p&gt;
+
+&lt;p&gt;要想制作一个 rpm 软件包就必须写一个软件包描述文件 spec。这个文件中包含了软件包的诸多信息，如：软件包的名字、版本、类别、说明摘要、创建时要执行什么指令、安装时要执行什么操作、以及软件包所要包含的文件列表等等。&lt;/p&gt;
+
+&lt;h4 id=&quot;头文件&quot;&gt;头文件&lt;/h4&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    Name:                  myapp  ←←←软件包的名字
+    Version:               0.1.0  ←←←软件包的版本
+    Release:               1%{?dist} ←←←发布序号 
+    Summary:               my first rpm ←←←软件包的摘要信息 
+    Group:                 ←←←软件包的安装分类，参见/usr/share/doc/rpm-4.x.x/GROUPS这个文件 
+    License:               GPL ←←←软件的授权方式 
+    URL:                   ←←←源码包的下载路径或者自己的博客地址或者公司网址之类 
+    Source0:               %{name}-%{version}.tar.gz ←←←源代码包的名称(默认时rpmbuid回到SOURCES目录中去找)，这里的name和version就是前两行定义的值。如果有其他配置或脚本则依次用Source1、Source2等等往后增加即可。 
+
+    BuildRoot:             %{_topdir}/BUILDROOT ←←←这是make install时使用的“虚拟”根目录，最终制作rpm安装包的文件就来自这里。 
+
+    BuildRequires:         ←←←在本机编译rpm包时需要的辅助工具，以逗号分隔。假如，要求编译myapp时，gcc的版本至少为4.4.2，则可以写成gcc &amp;gt;=4.2.2。还有其他依赖的话则以逗号分别继续写道后面。 
+    Requires:              ←←←编译好的rpm软件在其他机器上安装时，需要依赖的其他软件包，也以逗号分隔，有版本需求的可以 
+
+    %description           ←←←软件包的详细说明信息，但最多只能有80个英文字符。 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h4 id=&quot;制作rpm包每个阶段说明&quot;&gt;制作rpm包每个阶段说明&lt;/h4&gt;
+&lt;p&gt;制作rpm包有 %prep，%build，%install，%files，软件包制作，%clean 几个关键阶段。&lt;/p&gt;
+
+&lt;h5 id=&quot;prep-阶段&quot;&gt;%prep 阶段&lt;/h5&gt;
+&lt;p&gt;这个阶段里通常情况，主要完成对源代码包的解压和打补丁，而解压时最常见到的就是一句指令：&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;%setup -q 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;将 %sourcedir 目录下的源代码解压到 %builddir 目录下。&lt;/p&gt;
+
+&lt;h5 id=&quot;build-阶段&quot;&gt;%build 阶段&lt;/h5&gt;
+&lt;p&gt;这个阶段会在 %_builddir 目录下执行源码包的编译。一般是执行执行常见的configure和make操作，如果有些软件需要最先执行bootstrap之类的，可以放在configure之前来做 这个阶段我们最常见只有两条指令：&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;%configure 
+make %{?_smp_mflags} 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;%configure 是个宏常量，会自动将 prefix 设置成 /usr，如果我们需要个性化发安装的话，可以不使用宏常量，使用自定义的 configure命令来安装。
+我们可以通过rpm -E ‘%configure’ 命令来查看该宏变量的值。&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@bigstrong ~]# rpm -E '%configure'
+
+  CFLAGS=&quot;${CFLAGS:--O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches   -m64 -mtune=generic}&quot; ; export CFLAGS ;
+  CXXFLAGS=&quot;${CXXFLAGS:--O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches   -m64 -mtune=generic}&quot; ; export CXXFLAGS ;
+  FFLAGS=&quot;${FFLAGS:--O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches   -m64 -mtune=generic -I/usr/lib64/gfortran/modules}&quot; ; export FFLAGS ;        
+  FCFLAGS=&quot;${FCFLAGS:--O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches   -m64 -mtune=generic -I/usr/lib64/gfortran/modules}&quot; ; export FCFLAGS ;     
+  LDFLAGS=&quot;${LDFLAGS:--Wl,-z,relro }&quot;; export LDFLAGS;
+  [ &quot;1&quot; == 1 ] &amp;amp;&amp;amp; [ &quot;x86_64&quot; == ppc64le ] &amp;amp;&amp;amp; /usr/lib/rpm/redhat/libtool-handle-ppc64le.sh ;
+  for i in $(find . -name config.guess -o -name config.sub) ; do
+      [ -f /usr/lib/rpm/redhat/$(basename $i) ] &amp;amp;&amp;amp; /usr/bin/rm -f $i &amp;amp;&amp;amp; /usr/bin/cp -fv /usr/lib/rpm/redhat/$(basename $i) $i ;
+  done ;
+  ./configure --build=x86_64-redhat-linux-gnu --host=x86_64-redhat-linux-gnu \
+        --program-prefix= \
+        --disable-dependency-tracking \
+        --prefix=/usr \
+        --exec-prefix=/usr \
+        --bindir=/usr/bin \
+        --sbindir=/usr/sbin \
+        --sysconfdir=/etc \
+        --datadir=/usr/share \
+        --includedir=/usr/include \
+        --libdir=/usr/lib64 \
+        --libexecdir=/usr/libexec \
+        --localstatedir=/var \
+        --sharedstatedir=/var/lib \
+        --mandir=/usr/share/man \
+        --infodir=/usr/share/info
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h5 id=&quot;install-阶段&quot;&gt;%install 阶段&lt;/h5&gt;
+&lt;p&gt;这个阶段就是执行make install操作，这个阶段会在%buildrootdir目录里建好目录结构，然后将需要打包到rpm软件包里的文件从%builddir里拷贝到%_buildrootdir里对应的目录里。&lt;/p&gt;
+
+&lt;p&gt;当用户最终用 rpm -ivh name-version.rpm 安装软件包时，这些文件会安装到用户系统中相应的目录里。&lt;/p&gt;
+
+&lt;p&gt;这个阶段最常见的两条指令是：&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;rm -rf %{buildroot}
+make install 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h5 id=&quot;files-阶段&quot;&gt;%files 阶段&lt;/h5&gt;
+&lt;p&gt;这个阶段主要用来说明会将%{buildroot}目录下的哪些文件和目录最终打包到rpm包里。&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;%files 
+%defattr(-,root,root,-) 
+%{buildroot}/*
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;在安装rpm时，会将可执行的二进制文件放在/usr/bin目录下，动态库放在/usr/lib或者/usr/lib64目录下，配置文件放在/etc目录下，并且多次安装时新的配置文件不会覆盖以前已经存在的同名配置文件。 这里在写要打包的文件列表时，既可以以宏常量开头，也可以为“/”开头，没任何本质的区别，都表示从%{buildroot}中拷贝文件到最终的rpm包里；如果是相对路径，则表示要拷贝的文件位于%{_builddir}目录，这主要适用于那些在%install阶段没有被拷贝到%{buildroot}目录里的文件，最常见的就是诸如README、LICENSE之类的文件。如果不想将%{buildroot}里的某些文件或目录打包到rpm里，则用： %exclude dic_name 或者 file_name&lt;/p&gt;
+
+&lt;p&gt;关于%files阶段有两个特性：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;%{buildroot}里的所有文件都要明确被指定是否要被打包到rpm里。什么意思呢？假如，%{buildroot}目录下有4个目录a、b、c和d，在%files里仅指定a和b要打包到rpm里，如果不把c和d用exclude声明是要报错的；&lt;/li&gt;
+  &lt;li&gt;如果声明了%{buildroot}里不存在的文件或者目录也会报错。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h5 id=&quot;软件包制作阶段&quot;&gt;软件包制作阶段&lt;/h5&gt;
+&lt;p&gt;这个阶段是自动完成的，所以在SPEC文件里面是看不到的，这个阶段会将 %buildroot 目录的相关文件制作成rpm软件包最终放到 %rpmdir 目录里&lt;/p&gt;
+
+&lt;h5 id=&quot;clean阶段&quot;&gt;%clean阶段&lt;/h5&gt;
+&lt;p&gt;编译完成后一些清理工作，主要包括对%{buildroot}目录的清空(这不是必须的)，通常执行诸如make clean之类的命令。&lt;/p&gt;
+
+&lt;h5 id=&quot;changelog-阶段&quot;&gt;%changelog 阶段&lt;/h5&gt;
+&lt;p&gt;这是最后一个阶段，主要记录的每次打包时的修改变更日志。标准格式是：&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;* date +&quot;%a %b %d %Y&quot; 修改人 邮箱 本次版本x.y.z-p 
+- 本次变更修改了那些内容 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;rpm打包流程总结&quot;&gt;rpm打包流程总结&lt;/h3&gt;
+&lt;ol&gt;
+  &lt;li&gt;安装rpmbuild&lt;/li&gt;
+  &lt;li&gt;构建rpm的编译目录结构
+    &lt;ul&gt;
+      &lt;li&gt;可以使用rpmdev-setuptree命令创建&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;将源码放到到 rpmbuild/SOURCES&lt;/li&gt;
+  &lt;li&gt;在rpmbuild/SPECS目录创建spec文件
+    &lt;ul&gt;
+      &lt;li&gt;我们可以用rpmdev-newspec -o Name-version.spec命令来生成SPEC文件的模板，然后在上面修改就可&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;在rpmbuild/SPECS目录下执行打包编译： rpmbuild -bb xxxxx.spec 
+最终生成的rpm包&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;br /&gt;
+转载请注明：&lt;a href=&quot;https://liuqiang-code.github.io/&quot;&gt;刘强的博客&lt;/a&gt; » &lt;a href=&quot;https://liuqiang-code.github.io/2020/11/RpmBuild/&quot;&gt;点击阅读原文&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Mon, 02 Nov 2020 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2020/11/RpmBuild/</link>
+        <guid isPermaLink="true">http://localhost:4000/2020/11/RpmBuild/</guid>
+        
+        <category>Linux</category>
+        
+        
+      </item>
     
       <item>
         <title>Nginx之proxy_pass指令</title>

@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>rpmbuild制作rpm包总结</title>
+  <meta name="description" content="linux 软件安装方式源码包安装优点  开源，如果有足够的能力，可以修改源代码；  可以自由选择所需的功能；  软件是编译安装，所以更加适合自己的系统，更加稳定、效率更高；">
+  <meta name="author" content="leopardpan">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="rpmbuild制作rpm包总结">
+  <meta name="twitter:description" content="linux 软件安装方式源码包安装优点  开源，如果有足够的能力，可以修改源代码；  可以自由选择所需的功能；  软件是编译安装，所以更加适合自己的系统，更加稳定、效率更高；">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="rpmbuild制作rpm包总结">
+  <meta property="og:description" content="linux 软件安装方式源码包安装优点  开源，如果有足够的能力，可以修改源代码；  可以自由选择所需的功能；  软件是编译安装，所以更加适合自己的系统，更加稳定、效率更高；">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://localhost:4000/2020/11/RpmBuild/">
+  <link rel="alternate" type="application/rss+xml" title="刘强" href="http://localhost:4000/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+
+<!-- google 统计 -->
+  
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-9005224472374751",
+    enable_page_level_ads: true
+  });
+</script>
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      标签
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 刘强 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2> 
+                            
+                                BigStrong
+                            
+                        </h2>
+                        <p>
+                           
+                                Jave / 记录生活
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for 刘强" class="blog-button">刘强</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">行百里者半九十</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">欢迎来到我的个人博客~</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">标签</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <head>
+  <link rel="stylesheet" href="/css/post.css">
+</head>
+
+<article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title">rpmbuild制作rpm包总结</h1>
+    <div class="post-meta">
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2020-11-02 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2020-11-02</time>  
+
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
+    </div>
+  </header>
+
+  
+    <h2 class="post-title">目录</h2>
+    <ul>
+  <li><a href="#linux-软件安装方式">linux 软件安装方式</a>
+    <ul>
+      <li><a href="#源码包安装">源码包安装</a>
+        <ul>
+          <li><a href="#优点">优点</a></li>
+          <li><a href="#缺点">缺点</a></li>
+        </ul>
+      </li>
+      <li><a href="#二进制安装rpm">二进制安装(RPM)</a>
+        <ul>
+          <li><a href="#优点-1">优点</a></li>
+          <li><a href="#缺点-1">缺点</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#安装rpmbuild工具">安装rpmbuild工具</a></li>
+  <li><a href="#rpmbuid打包目录">rpmbuid打包目录</a>
+    <ul>
+      <li><a href="#rpmbuid-宏变量配置文件">rpmbuid 宏变量配置文件</a>
+        <ul>
+          <li><a href="#路径">路径</a></li>
+          <li><a href="#查看宏变量值">查看宏变量值</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#spec文件">spec文件</a>
+    <ul>
+      <li><a href="#头文件">头文件</a></li>
+      <li><a href="#制作rpm包每个阶段说明">制作rpm包每个阶段说明</a>
+        <ul>
+          <li><a href="#prep-阶段">%prep 阶段</a></li>
+          <li><a href="#build-阶段">%build 阶段</a></li>
+          <li><a href="#install-阶段">%install 阶段</a></li>
+          <li><a href="#files-阶段">%files 阶段</a></li>
+          <li><a href="#软件包制作阶段">软件包制作阶段</a></li>
+          <li><a href="#clean阶段">%clean阶段</a></li>
+          <li><a href="#changelog-阶段">%changelog 阶段</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#rpm打包流程总结">rpm打包流程总结</a></li>
+</ul>
+
+  
+
+  <section class="post">
+    <h3 id="linux-软件安装方式">linux 软件安装方式</h3>
+<h4 id="源码包安装">源码包安装</h4>
+<h5 id="优点">优点</h5>
+<ol>
+  <li>开源，如果有足够的能力，可以修改源代码；</li>
+  <li>可以自由选择所需的功能；</li>
+  <li>软件是编译安装，所以更加适合自己的系统，更加稳定、效率更高；</li>
+</ol>
+
+<h5 id="缺点">缺点</h5>
+<ol>
+  <li>安装过程步骤较多，尤其安装较大的软件集合时（如LAMP环境搭建），容易出现拼写错误；</li>
+  <li>编译过程时间较长，安装比二进制安装时间长；</li>
+  <li>因为是编译安装，安装过程中一旦报错新手很难解决；</li>
+</ol>
+
+<h4 id="二进制安装rpm">二进制安装(RPM)</h4>
+<h5 id="优点-1">优点</h5>
+<ol>
+  <li>包管理系统简单，只通过几个命令就可以实现包的安装、升级、查询和卸载；</li>
+  <li>安装速度比源码包安装快的多；</li>
+</ol>
+
+<h5 id="缺点-1">缺点</h5>
+<ol>
+  <li>经过编译，不再可以看到源代码；</li>
+  <li>功能选择不如源码包灵活；</li>
+  <li>依赖性；</li>
+</ol>
+
+<h3 id="安装rpmbuild工具">安装rpmbuild工具</h3>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum install rpm* rpm-build rpmdev*
+</code></pre></div></div>
+<h3 id="rpmbuid打包目录">rpmbuid打包目录</h3>
+
+<p>rpm打包目录有一些严格的层次上的要求。</p>
+
+<p>pm的版本&lt;=4.4.x，rpmbuid工具其默认的工作路径是 /usr/src/redhat因为权限的问题，普通用户不能制作rpm包，制作rpm软件包时必须切换到 root 身份才可以。</p>
+
+<p>rpm从4.5.x版本开始，将rpmbuid的默认工作路径移动到用户家目录下的rpmbuild目录里，即 $HOME/rpmbuild ，并且推荐用户在制作rpm软件包时尽量不要以root身份进行操作。</p>
+
+<p>rpmbuild默认工作路径的确定，通常由在 /usr/lib/rpm/macros  这个文件里的一个叫做 %_topdir 的宏变量来定义。如果用户想更改这个目录名，rpm官方并不推荐直接更改这个目录，而是在用户家目录下建立一个名为 .rpmmacros 的隐藏文件(Linux下隐藏文件,前面的点不能少)，然后在里面重新定义 %_topdir，指向一个新的目录名。这样就可以满足某些用户的差异化需求了。通常情况下.rpmmacros文件里一般只有一行内容，比如：</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>%_topdir    $HOME/myrpmbuildenv 
+</code></pre></div></div>
+<p>在%_topdir目录下一般需要建立6个目录<br />
+可以使用 rpmdev-setuptree命令在当前用户home/rpmbuild目录里自动建立上述目录。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>目录名</th>
+      <th>说明</th>
+      <th>macros中的宏名</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>BUILD</td>
+      <td>编译rpm包的临时目录</td>
+      <td>%_builddir</td>
+    </tr>
+    <tr>
+      <td>BUILDROOT</td>
+      <td>编译后生成的软件临时安装目录</td>
+      <td>%_buildrootdir</td>
+    </tr>
+    <tr>
+      <td>RPMS</td>
+      <td>最终生成的可安装rpm包的所在目录</td>
+      <td>%_rpmdir</td>
+    </tr>
+    <tr>
+      <td>SOURCES</td>
+      <td>所有源代码和补丁文件的存放目录</td>
+      <td>%_sourcedir</td>
+    </tr>
+    <tr>
+      <td>SPECS</td>
+      <td>存放SPEC文件的目录</td>
+      <td>%_specdir</td>
+    </tr>
+    <tr>
+      <td>SRPMS</td>
+      <td>软件最终的rpm源码格式存放路径</td>
+      <td>%_srcrpmdir</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="rpmbuid-宏变量配置文件">rpmbuid 宏变量配置文件</h4>
+
+<h5 id="路径">路径</h5>
+<p>/usr/lib/rpm/macros</p>
+<h5 id="查看宏变量值">查看宏变量值</h5>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rpm -E "%{macro}"
+
+注意： %{macro} 是shell中获取变量的标识，也可以用%macro 获取 
+变量名外面的花括号是可选的，加不加都行，加花括号是为了帮助解释器识别变量的边界
+</code></pre></div></div>
+
+<p>%{?dist} 表示什么含义？</p>
+
+<p>不加问号，如果 dist 有定义，那么就会用定义的值替换，否则就会保 %{dist};
+加问好，如果 dist 有定义，那么也是会用定义的值替换，否则就直接移除这个tag %{?dist}</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rpm -E 'foo:%{foo}'$'\n''bar:%{?bar}'
+foo:%{foo}
+bar:
+</code></pre></div></div>
+
+<h3 id="spec文件">spec文件</h3>
+<p>制作 rpm 软件包并不是一件复杂的工作，其中的关键在于编写软件包的 spec 描述文件。</p>
+
+<p>要想制作一个 rpm 软件包就必须写一个软件包描述文件 spec。这个文件中包含了软件包的诸多信息，如：软件包的名字、版本、类别、说明摘要、创建时要执行什么指令、安装时要执行什么操作、以及软件包所要包含的文件列表等等。</p>
+
+<h4 id="头文件">头文件</h4>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    Name:                  myapp  ←←←软件包的名字
+    Version:               0.1.0  ←←←软件包的版本
+    Release:               1%{?dist} ←←←发布序号 
+    Summary:               my first rpm ←←←软件包的摘要信息 
+    Group:                 ←←←软件包的安装分类，参见/usr/share/doc/rpm-4.x.x/GROUPS这个文件 
+    License:               GPL ←←←软件的授权方式 
+    URL:                   ←←←源码包的下载路径或者自己的博客地址或者公司网址之类 
+    Source0:               %{name}-%{version}.tar.gz ←←←源代码包的名称(默认时rpmbuid回到SOURCES目录中去找)，这里的name和version就是前两行定义的值。如果有其他配置或脚本则依次用Source1、Source2等等往后增加即可。 
+
+    BuildRoot:             %{_topdir}/BUILDROOT ←←←这是make install时使用的“虚拟”根目录，最终制作rpm安装包的文件就来自这里。 
+
+    BuildRequires:         ←←←在本机编译rpm包时需要的辅助工具，以逗号分隔。假如，要求编译myapp时，gcc的版本至少为4.4.2，则可以写成gcc &gt;=4.2.2。还有其他依赖的话则以逗号分别继续写道后面。 
+    Requires:              ←←←编译好的rpm软件在其他机器上安装时，需要依赖的其他软件包，也以逗号分隔，有版本需求的可以 
+
+    %description           ←←←软件包的详细说明信息，但最多只能有80个英文字符。 
+</code></pre></div></div>
+<h4 id="制作rpm包每个阶段说明">制作rpm包每个阶段说明</h4>
+<p>制作rpm包有 %prep，%build，%install，%files，软件包制作，%clean 几个关键阶段。</p>
+
+<h5 id="prep-阶段">%prep 阶段</h5>
+<p>这个阶段里通常情况，主要完成对源代码包的解压和打补丁，而解压时最常见到的就是一句指令：</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>%setup -q 
+</code></pre></div></div>
+<p>将 %sourcedir 目录下的源代码解压到 %builddir 目录下。</p>
+
+<h5 id="build-阶段">%build 阶段</h5>
+<p>这个阶段会在 %_builddir 目录下执行源码包的编译。一般是执行执行常见的configure和make操作，如果有些软件需要最先执行bootstrap之类的，可以放在configure之前来做 这个阶段我们最常见只有两条指令：</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>%configure 
+make %{?_smp_mflags} 
+</code></pre></div></div>
+<p>%configure 是个宏常量，会自动将 prefix 设置成 /usr，如果我们需要个性化发安装的话，可以不使用宏常量，使用自定义的 configure命令来安装。
+我们可以通过rpm -E ‘%configure’ 命令来查看该宏变量的值。</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@bigstrong ~]# rpm -E '%configure'
+
+  CFLAGS="${CFLAGS:--O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches   -m64 -mtune=generic}" ; export CFLAGS ;
+  CXXFLAGS="${CXXFLAGS:--O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches   -m64 -mtune=generic}" ; export CXXFLAGS ;
+  FFLAGS="${FFLAGS:--O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches   -m64 -mtune=generic -I/usr/lib64/gfortran/modules}" ; export FFLAGS ;        
+  FCFLAGS="${FCFLAGS:--O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches   -m64 -mtune=generic -I/usr/lib64/gfortran/modules}" ; export FCFLAGS ;     
+  LDFLAGS="${LDFLAGS:--Wl,-z,relro }"; export LDFLAGS;
+  [ "1" == 1 ] &amp;&amp; [ "x86_64" == ppc64le ] &amp;&amp; /usr/lib/rpm/redhat/libtool-handle-ppc64le.sh ;
+  for i in $(find . -name config.guess -o -name config.sub) ; do
+      [ -f /usr/lib/rpm/redhat/$(basename $i) ] &amp;&amp; /usr/bin/rm -f $i &amp;&amp; /usr/bin/cp -fv /usr/lib/rpm/redhat/$(basename $i) $i ;
+  done ;
+  ./configure --build=x86_64-redhat-linux-gnu --host=x86_64-redhat-linux-gnu \
+        --program-prefix= \
+        --disable-dependency-tracking \
+        --prefix=/usr \
+        --exec-prefix=/usr \
+        --bindir=/usr/bin \
+        --sbindir=/usr/sbin \
+        --sysconfdir=/etc \
+        --datadir=/usr/share \
+        --includedir=/usr/include \
+        --libdir=/usr/lib64 \
+        --libexecdir=/usr/libexec \
+        --localstatedir=/var \
+        --sharedstatedir=/var/lib \
+        --mandir=/usr/share/man \
+        --infodir=/usr/share/info
+</code></pre></div></div>
+
+<h5 id="install-阶段">%install 阶段</h5>
+<p>这个阶段就是执行make install操作，这个阶段会在%buildrootdir目录里建好目录结构，然后将需要打包到rpm软件包里的文件从%builddir里拷贝到%_buildrootdir里对应的目录里。</p>
+
+<p>当用户最终用 rpm -ivh name-version.rpm 安装软件包时，这些文件会安装到用户系统中相应的目录里。</p>
+
+<p>这个阶段最常见的两条指令是：</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rm -rf %{buildroot}
+make install 
+</code></pre></div></div>
+
+<h5 id="files-阶段">%files 阶段</h5>
+<p>这个阶段主要用来说明会将%{buildroot}目录下的哪些文件和目录最终打包到rpm包里。</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>%files 
+%defattr(-,root,root,-) 
+%{buildroot}/*
+</code></pre></div></div>
+
+<p>在安装rpm时，会将可执行的二进制文件放在/usr/bin目录下，动态库放在/usr/lib或者/usr/lib64目录下，配置文件放在/etc目录下，并且多次安装时新的配置文件不会覆盖以前已经存在的同名配置文件。 这里在写要打包的文件列表时，既可以以宏常量开头，也可以为“/”开头，没任何本质的区别，都表示从%{buildroot}中拷贝文件到最终的rpm包里；如果是相对路径，则表示要拷贝的文件位于%{_builddir}目录，这主要适用于那些在%install阶段没有被拷贝到%{buildroot}目录里的文件，最常见的就是诸如README、LICENSE之类的文件。如果不想将%{buildroot}里的某些文件或目录打包到rpm里，则用： %exclude dic_name 或者 file_name</p>
+
+<p>关于%files阶段有两个特性：</p>
+<ul>
+  <li>%{buildroot}里的所有文件都要明确被指定是否要被打包到rpm里。什么意思呢？假如，%{buildroot}目录下有4个目录a、b、c和d，在%files里仅指定a和b要打包到rpm里，如果不把c和d用exclude声明是要报错的；</li>
+  <li>如果声明了%{buildroot}里不存在的文件或者目录也会报错。</li>
+</ul>
+
+<h5 id="软件包制作阶段">软件包制作阶段</h5>
+<p>这个阶段是自动完成的，所以在SPEC文件里面是看不到的，这个阶段会将 %buildroot 目录的相关文件制作成rpm软件包最终放到 %rpmdir 目录里</p>
+
+<h5 id="clean阶段">%clean阶段</h5>
+<p>编译完成后一些清理工作，主要包括对%{buildroot}目录的清空(这不是必须的)，通常执行诸如make clean之类的命令。</p>
+
+<h5 id="changelog-阶段">%changelog 阶段</h5>
+<p>这是最后一个阶段，主要记录的每次打包时的修改变更日志。标准格式是：</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>* date +"%a %b %d %Y" 修改人 邮箱 本次版本x.y.z-p 
+- 本次变更修改了那些内容 
+</code></pre></div></div>
+
+<h3 id="rpm打包流程总结">rpm打包流程总结</h3>
+<ol>
+  <li>安装rpmbuild</li>
+  <li>构建rpm的编译目录结构
+    <ul>
+      <li>可以使用rpmdev-setuptree命令创建</li>
+    </ul>
+  </li>
+  <li>将源码放到到 rpmbuild/SOURCES</li>
+  <li>在rpmbuild/SPECS目录创建spec文件
+    <ul>
+      <li>我们可以用rpmdev-newspec -o Name-version.spec命令来生成SPEC文件的模板，然后在上面修改就可</li>
+    </ul>
+  </li>
+  <li>在rpmbuild/SPECS目录下执行打包编译： rpmbuild -bb xxxxx.spec 
+最终生成的rpm包</li>
+</ol>
+
+<p><br />
+转载请注明：<a href="https://liuqiang-code.github.io/">刘强的博客</a> » <a href="https://liuqiang-code.github.io/2020/11/RpmBuild/">点击阅读原文</a></p>
+
+  </section>
+
+</article>
+
+<section>
+
+            <div class="content-play">
+              <p><a href="javascript:void(0)" onclick="dashangToggle()" class="dashang" title="打赏，支持一下">打赏一个呗</a></p>
+              <div class="hide_box-play"></div>
+              <div class="shang_box-play">
+                <a class="shang_close-play" href="javascript:void(0)" onclick="dashangToggle()" title="关闭"><img src="/images/payimg/close.jpg" alt="取消" /></a>
+                <div class="shang_tit-play">
+                  <p>感谢您的支持，我会继续努力的!</p>
+                </div>
+                <div class="shang_payimg">
+                    <img src="/images/payimg/alipayimg.jpg" alt="扫码支持" title="扫一扫" />
+                </div>
+              <div class="shang_payimg">    
+                    <img src="/images/payimg/weipayimg.jpg" alt="扫码支持" title="扫一扫" />
+                </div>
+                <div class="pay_explain">扫码打赏，你说多少就多少</div>
+                <div class="shang_payselect">
+                  <div class="pay_item checked" data-id="alipay">
+                    <span class="pay_logo"><img src="/images/payimg/alipay.jpg" alt="支付宝" /></span>
+                  </div>
+                  <div class="pay_item" data-id="weipay">
+                    <span class="pay_logo"><img src="/images/payimg/wechat.jpg" alt="微信" /></span>
+                  </div>
+                </div>
+                <div class="shang_info-play">
+                  <p>打开<span id="shang_pay_txt">支付宝</span>扫一扫，即可进行扫码打赏哦</p>
+                </div>
+              </div>
+            </div>
+            <script type="text/javascript">
+            function dashangToggle(){
+              $(".hide_box-play").fadeToggle();
+              $(".shang_box-play").fadeToggle();
+            }
+            </script>
+
+            <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';"></div>
+
+            <style type="text/css">
+              .content-play{width:80%;margin-top: 20px;margin-bottom: 10px;height:40px;}
+              .hide_box-play{z-index:999;filter:alpha(opacity=50);background:#666;opacity: 0.5;-moz-opacity: 0.5;left:0;top:0;height:99%;width:100%;position:fixed;display:none;}
+              .shang_box-play{width:540px;height:540px;padding:10px;background-color:#fff;border-radius:10px;position:fixed;z-index:1000;left:50%;top:50%;margin-left:-280px;margin-top:-280px;border:1px dotted #dedede;display:none;}
+              .shang_box-play img{border:none;border-width:0;}
+              .dashang{display:block;width:100px;margin:5px auto;height:25px;line-height:25px;padding:10px;background-color:#E74851;color:#fff;text-align:center;text-decoration:none;border-radius:10px;font-weight:bold;font-size:16px;transition: all 0.3s;}
+              .dashang:hover{opacity:0.8;padding:15px;font-size:18px;}
+              .shang_close-play{float:right;display:inline-block;
+                margin-right: 10px;margin-top: 20px;
+              }
+              .shang_logo{display:block;text-align:center;margin:20px auto;}
+              .shang_tit-play{width: 100%;height: 75px;text-align: center;line-height: 66px;color: #a3a3a3;font-size: 16px;background: url('/images/payimg/cy-reward-title-bg.jpg');font-family: 'Microsoft YaHei';margin-top: 7px;margin-right:2px;}
+              .shang_tit-play p{color:#a3a3a3;text-align:center;font-size:16px;}
+              .shang_payimg{width:140px;padding:10px;padding-left: 80px; /*border:6px solid #EA5F00;**/margin:0 auto;border-radius:3px;height:140px;display:inline-block;}
+              .shang_payimg img{display:inline-block;margin-right:10px;float:left;text-align:center;width:140px;height:140px; }
+              .pay_explain{text-align:center;margin:10px auto;font-size:12px;color:#545454;}
+              .shang_payselect{text-align:center;margin:0 auto;margin-top:40px;cursor:pointer;height:60px;width:500px;margin-left:110px;}
+              .shang_payselect .pay_item{display:inline-block;margin-right:140px;float:left;}
+              .shang_info-play{clear:both;}
+              .shang_info-play p,.shang_info-play a{color:#C3C3C3;text-align:center;font-size:12px;text-decoration:none;line-height:2em;}
+            </style>
+
+       <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2020/10/NginxProxyPass/" data-toggle="tooltip" data-placement="top" title="Nginx之proxy_pass指令">上一篇：  <span>Nginx之proxy_pass指令</span>
+            </a>
+        </li>
+        
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+
+  
+    <div id="disqus_thread"></div>
+    <script>
+    
+    var disqus_config = function () {
+        this.page.url = "http://localhost:4000/2020/11/RpmBuild/";
+        this.page.identifier = "/2020/11/RpmBuild/";
+    };
+    var disqus_shortname = 'leopard';
+    
+    (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>要查看<a href="http://disqus.com/?ref_noscript"> Disqus </a>评论，请启用 JavaScript</noscript>
+    
+  
+
+</section>
+
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/liuqiang-code" title="@liuqiang-code 的 Github" target="_blank">
+              <div class="footer-social-icon" style="background:url(/images/github.png);"></div>
+            </a>
+          </li>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:lz673253@163.com" title="Contact me">
+              <div class="footer-social-icon" style="background:url(/images/email.png);"></div>
+            </a>
+          </li>
+          
+          
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <div class="footer-social-icon" style="background:url(/images/rss.png);"></div>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; 刘强 2020 Theme by <a href="https://github.com/liuqiang-code">bigstrong</a>
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>
