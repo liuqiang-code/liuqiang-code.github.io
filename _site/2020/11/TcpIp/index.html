@@ -6,17 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>SpringBoot默认存储路径带来的BUG</title>
-  <meta name="description" content="背景">
+  <title>浅谈TCP/IP</title>
+  <meta name="description" content="谈一谈你对TCP/IP四层模型，OSI七层模型的理解？为了增强通用性和兼容性，计算机网络都被设计成层次机构，每一层都遵守一定的规则。">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="SpringBoot默认存储路径带来的BUG">
-  <meta name="twitter:description" content="背景">
+  <meta name="twitter:title" content="浅谈TCP/IP">
+  <meta name="twitter:description" content="谈一谈你对TCP/IP四层模型，OSI七层模型的理解？为了增强通用性和兼容性，计算机网络都被设计成层次机构，每一层都遵守一定的规则。">
   
   <meta property="og:type" content="article">
-  <meta property="og:title" content="SpringBoot默认存储路径带来的BUG">
-  <meta property="og:description" content="背景">
+  <meta property="og:title" content="浅谈TCP/IP">
+  <meta property="og:description" content="谈一谈你对TCP/IP四层模型，OSI七层模型的理解？为了增强通用性和兼容性，计算机网络都被设计成层次机构，每一层都遵守一定的规则。">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link rel="canonical" href="http://localhost:4000/2020/07/Tomcat2SpringBootBug/">
+  <link rel="canonical" href="http://localhost:4000/2020/11/TcpIp/">
   <link rel="alternate" type="application/rss+xml" title="刘强" href="http://localhost:4000/feed.xml">
   
   <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
@@ -160,10 +160,10 @@
 
 <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
-    <h1 class="post-title">SpringBoot默认存储路径带来的BUG</h1>
+    <h1 class="post-title">浅谈TCP/IP</h1>
     <div class="post-meta">
       <img src="/images/calendar.png" width="20px"/> 
-      <time datetime="2020-07-28 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2020-07-28</time>  
+      <time datetime="2020-11-02 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2020-11-02</time>  
 
       <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
     </p>
@@ -173,47 +173,129 @@
   
     <h2 class="post-title">目录</h2>
     <ul>
-  <li><a href="#背景">背景</a></li>
-  <li><a href="#原因">原因</a></li>
-  <li><a href="#分析">分析</a></li>
-  <li><a href="#处理方案">处理方案</a></li>
-  <li><a href="#总结">总结</a></li>
+  <li><a href="#谈一谈你对tcpip四层模型osi七层模型的理解">谈一谈你对TCP/IP四层模型，OSI七层模型的理解？</a></li>
+  <li><a href="#说说tcp-3次握手的过程">说说TCP 3次握手的过程？</a></li>
+  <li><a href="#为什么要3次2次4次不行吗">为什么要3次？2次，4次不行吗？</a></li>
+  <li><a href="#那么四次挥手的过程呢">那么四次挥手的过程呢？</a></li>
+  <li><a href="#为什么要等待2msl的时间才关闭">为什么要等待2MSL的时间才关闭？</a></li>
+  <li><a href="#tcp怎么保证传输过程的可靠性">TCP怎么保证传输过程的可靠性？</a></li>
+  <li><a href="#说下浏览器请求一个网址的过程">说下浏览器请求一个网址的过程？</a></li>
+  <li><a href="#知道https的工作原理吗">知道HTTPS的工作原理吗？</a></li>
+  <li><a href="#负载均衡有哪些实现方式">负载均衡有哪些实现方式？</a></li>
 </ul>
 
   
 
   <section class="post">
-    <h3 id="背景">背景</h3>
+    <h3 id="谈一谈你对tcpip四层模型osi七层模型的理解">谈一谈你对TCP/IP四层模型，OSI七层模型的理解？</h3>
+<p>为了增强通用性和兼容性，计算机网络都被设计成层次机构，每一层都遵守一定的规则。</p>
 
-<p>　 接到消息说线上一直运行的一个平台出现了Bug，需要排查原因。收到这个消息的时候一脸惊讶，为什么好好运行的平台会突然出问题。排查运行日志发现是无法读取到文件。核实得知线上的工程以前是以war包的形式运行在Tomcat容器中而最近改成了jar包独立运行。</p>
+<p>因此有了OSI这样一个抽象的网络通信参考模型，按照这个标准使计算机网络系统可以互相连接。</p>
 
-<h3 id="原因">原因</h3>
+<p>物理层：通过网线、光缆等这种物理方式将电脑连接起来。传递的数据是比特流，0101010100。</p>
 
-<p>经过排查定位错误代码为：</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  ServletContext servletContext = webApplicationConnect.getServletContext();
-</code></pre></div></div>
-<p>在Linux服务器上SpringBoot通过该方式获取的默认存储路径为 /tmp</p>
+<p>数据链路层：首先，把比特流封装成数据帧的格式，对0、1进行分组。电脑连接起来之后，数据都经过网卡来传输，而网卡上定义了全世界唯一的MAC地址。然后再通过广播的形式向局域网内所有电脑发送数据，再根据数据中MAC地址和自身对比判断是否是发给自己的。</p>
 
-<p><img src="/images/posts/Tomcat2SpringBootBug/image1.png" /></p>
+<p>网络层：广播的形式太低效，为了区分哪些MAC地址属于同一个子网，网络层定义了IP和子网掩码，通过对IP和子网掩码进行与运算就知道是否是同一个子网，再通过路由器和交换机进行传输。IP协议属于网络层的协议。</p>
 
-<h3 id="分析">分析</h3>
+<p>传输层：有了网络层的MAC+IP地址之后，为了确定数据包是从哪个进程发送过来的，就需要端口号，通过端口来建立通信，比如TCP和UDP属于这一层的协议。</p>
+
+<p>会话层：负责建立和断开连接</p>
+
+<p>表示层：为了使得数据能够被其他的计算机理解，再次将数据转换成另外一种格式，比如文字、视频、图片等。</p>
+
+<p>应用层：最高层，面对用户，提供计算机网络与最终呈现给用户的界面
+<img src="/images/posts/TcpIp/OSI七层协议.png" /></p>
+
+<p>TCP/IP则是四层的结构，相当于是对OSI模型的简化。</p>
 
 <ul>
-  <li>Linux 重启时会自动清理该目录，同时也存在一个定时任务清理，显然文件保存该目录很不合理。</li>
-  <li>SpringBoot工程重启后获取的路径是不同的，这就导致每次重启工程后获取文件操作出错。</li>
+  <li>数据链路层，也有称作网络访问层、网络接口层。他包含了OSI模型的物理层和数据链路层，把电脑连接起来。</li>
+  <li>网络层，也叫做IP层，处理IP数据包的传输、路由，建立主机间的通信。</li>
+  <li>传输层，就是为两台主机设备提供端到端的通信。</li>
+  <li>应用层，包含OSI的会话层、表示层和应用层，提供了一些常用的协议规范，比如FTP、SMPT、HTTP等。</li>
 </ul>
 
-<h3 id="处理方案">处理方案</h3>
-<p>　 在SpringBoot工程的application.propertis配置文件中添加一个文件存储路径，所有有关文件的操作都是以该路径为基准。</p>
+<p>总结下来，就是物理层通过物理手段把电脑连接起来，数据链路层则对比特流的数据进行分组，网络层来建立主机到主机的通信，传输层建立端口到端口的通信，应用层最终负责建立连接，数据格式转换，最终呈现给用户。</p>
 
-<h3 id="总结">总结</h3>
-<ul>
-  <li>根据系统运行日志排除问题</li>
-  <li>当使用一项新技术时需要对该技术有全面的了解，切记盲目使用。</li>
-</ul>
+<h3 id="说说tcp-3次握手的过程">说说TCP 3次握手的过程？</h3>
+
+<p>建立连接前server端需要监听端口，所以初始状态是LISTEN。</p>
+
+<ol>
+  <li>client端建立连接，发送一个SYN同步包，发送之后状态变成SYN_SENT</li>
+  <li>server端收到SYN之后，同意建立连接，返回一个ACK响应，同时也会给client发送一个SYN包，发送完成之后状态变为SYN_RCVD</li>
+  <li>client端收到server的ACK之后，状态变为ESTABLISHED，返回ACK给server端。server收到之后状态也变为ESTABLISHED，连接建立完成。
+<img src="/images/posts/TcpIp/TCP三次握手.png" /></li>
+</ol>
+
+<h3 id="为什么要3次2次4次不行吗">为什么要3次？2次，4次不行吗？</h3>
+<p>因为TCP是双工传输模式，不区分客户端和服务端，连接的建立是双向的过程。</p>
+
+<p>如果只有两次，无法做到双向连接的建立，从建立连接server回复的SYN和ACK合并成一次可以看出来，他也不需要4次。</p>
+
+<p>挥手为什么要四次？因为挥手的ACK和FIN不能同时发送，因为数据发送的截止时间不同。</p>
+
+<h3 id="那么四次挥手的过程呢">那么四次挥手的过程呢？</h3>
+<ol>
+  <li>client端向server发送FIN包，进入FIN_WAIT_1状态，这代表client端已经没有数据要发送了</li>
+  <li>server端收到之后，返回一个ACK，进入CLOSE_WAIT等待关闭的状态，因为server端可能还有没有发送完成的数据</li>
+  <li>server端收到之后，返回一个ACK，进入CLOSE_WAIT等待关闭的状态，因为server端可能还有没有发送完成的数据</li>
+  <li>client收到ACK之后，进入TIME_WAIT的状态，同时回复ACK，server收到之后直接进入CLOSED状态，连接关闭。但是client要等待2MSL(报文最大生存时间)的时间，才会进入CLOSED状态。
+<img src="/images/posts/TcpIp/四次挥手.png" /></li>
+</ol>
+
+<h3 id="为什么要等待2msl的时间才关闭">为什么要等待2MSL的时间才关闭？</h3>
+<ol>
+  <li>为了保证连接的可靠关闭。如果server没有收到最后一个ACK，那么就会重发FIN。</li>
+  <li>为了避免端口重用带来的数据混淆。如果client直接进入CLOSED状态，又用相同端口号向server建立一个连接，上一次连接的部分数据在网络中延迟到达server，数据就可能发生混淆了。</li>
+</ol>
+
+<h3 id="tcp怎么保证传输过程的可靠性">TCP怎么保证传输过程的可靠性？</h3>
+<p>校验和：发送方在发送数据之前计算校验和，接收方收到数据后同样计算，如果不一致，那么传输有误。</p>
+
+<p>确认应答，序列号：TCP进行传输时数据都进行了编号，每次接收方返回ACK都有确认序列号。</p>
+
+<p>超时重传：如果发送方发送数据一段时间后没有收到ACK，那么就重发数据。</p>
+
+<p>连接管理：三次握手和四次挥手的过程。</p>
+
+<p>流量控制：TCP协议报头包含16位的窗口大小，接收方会在返回ACK时同时把自己的即时窗口填入，发送方就根据报文中窗口的大小控制发送速度。</p>
+
+<p>拥塞控制：刚开始发送数据的时候，拥塞窗口是1，以后每次收到ACK，则拥塞窗口+1，然后将拥塞窗口和收到的窗口取较小值作为实际发送的窗口，如果发生超时重传，拥塞窗口重置为1。这样做的目的就是为了保证传输过程的高效性和可靠性。</p>
+
+<h3 id="说下浏览器请求一个网址的过程">说下浏览器请求一个网址的过程？</h3>
+<ol>
+  <li>首先通过DNS服务器把域名解析成IP地址，通过IP和子网掩码判断是否属于同一个子网</li>
+  <li>构造应用层请求http报文，传输层添加TCP/UDP头部，网络层添加IP头部，数据链路层添加以太网协议头部</li>
+  <li>数据经过路由器、交换机转发，最终达到目标服务器，目标服务器同样解析数据，最终拿到http报文，按照对应的程序的逻辑响应回去。
+<img src="/images/posts/TcpIp/请求解析.png" /></li>
+</ol>
+
+<h3 id="知道https的工作原理吗">知道HTTPS的工作原理吗？</h3>
+<ol>
+  <li>用户通过浏览器请求https网站，服务器收到请求，选择浏览器支持的加密和hash算法，同时返回数字证书给浏览器，包含颁发机构、网址、公钥、证书有效期等信息。</li>
+  <li>浏览器对证书的内容进行校验，如果有问题，则会有一个提示警告。否则，就生成一个随机数X，同时使用证书中的公钥进行加密，并且发送给服务器。</li>
+  <li>浏览器对证书的内容进行校验，如果有问题，则会有一个提示警告。否则，就生成一个随机数X，同时使用证书中的公钥进行加密，并且发送给服务器。</li>
+  <li>浏览器则使用X和之前约定的加密算法进行解密，得到最终的网页内容
+<img src="/images/posts/TcpIp/请求解析https.png" /></li>
+</ol>
+
+<h3 id="负载均衡有哪些实现方式">负载均衡有哪些实现方式？</h3>
+<p>DNS：这是最简单的负载均衡的方式，一般用于实现地理级别的负载均衡，不同地域的用户通过DNS的解析可以返回不同的IP地址，这种方式的负载均衡简单，但是扩展性太差，控制权在域名服务商。</p>
+
+<p>Http重定向：通过修改Http响应头的Location达到负载均衡的目的，Http的302重定向。这种方式对性能有影响，而且增加请求耗时。</p>
+
+<p>反向代理：作用于应用层的模式，也被称作为七层负载均衡，比如常见的Nginx，性能一般可以达到万级。这种方式部署简单，成本低，而且容易扩展。</p>
+
+<p>IP：作用于网络层的和传输层的模式，也被称作四层负载均衡，通过对数据包的IP地址和端口进行修改来达到负载均衡的效果。常见的有LVS（Linux Virtual Server），通常性能可以支持10万级并发。</p>
+
+<p>按照类型来划分的话，还可以分成DNS负载均衡、硬件负载均衡、软件负载均衡。</p>
+
+<p>其中硬件负载均衡价格昂贵，性能最好，能达到百万级，软件负载均衡包括Nginx、LVS这种。</p>
 
 <p><br />
-转载请注明：<a href="https://liuqiang-code.github.io/">刘强的博客</a> » <a href="https://liuqiang-code.github.io/2020/07/Tomcat2SpringBootBug/">点击阅读原文</a></p>
+转载请注明：<a href="https://liuqiang-code.github.io/">刘强的博客</a> » <a href="https://liuqiang-code.github.io/2021/01/TcpIp/">点击阅读原文</a></p>
 
   </section>
 
@@ -283,15 +365,10 @@
        <ul class="pager">
         
         <li class="previous">
-            <a href="/2020/07/GitCourse/" data-toggle="tooltip" data-placement="top" title="Git笔录">上一篇：  <span>Git笔录</span>
+            <a href="/2020/11/RpmBuild/" data-toggle="tooltip" data-placement="top" title="rpmbuild制作rpm包总结">上一篇：  <span>rpmbuild制作rpm包总结</span>
             </a>
         </li>
         
-        
-        <li class="next">
-            <a href="/2020/08/HTTP/" data-toggle="tooltip" data-placement="top" title="有关爬虫的HTTP网络基础">下一篇：  <span>有关爬虫的HTTP网络基础</span>
-            </a>
-        </li>
         
     </ul>
 </section>
@@ -303,8 +380,8 @@
     <script>
     
     var disqus_config = function () {
-        this.page.url = "http://localhost:4000/2020/07/Tomcat2SpringBootBug/";
-        this.page.identifier = "/2020/07/Tomcat2SpringBootBug/";
+        this.page.url = "http://localhost:4000/2020/11/TcpIp/";
+        this.page.identifier = "/2020/11/TcpIp/";
     };
     var disqus_shortname = 'leopard';
     
